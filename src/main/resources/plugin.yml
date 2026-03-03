@@ -1,0 +1,30 @@
+name: JLG21
+version: '1.0.0'
+main: de.martin.jumpleaguegym.main.Main
+api-version: '1.21'
+
+commands:
+  hub:
+    description: Teleportiert dich zurueck in die Lobby.
+  lobby:
+    description: Teleportiert dich zur Lobby.
+  modul:
+    description: Teleportiert dich zu einem Modul.
+  map:
+    description: Teleportiert dich zu einer Deathmatch-Map.
+  start:
+    description: Startet die Jump-League Runde.
+  dfLocation:
+    description: Setzt eine Spawn-Location auf einer Deathmatch-Map.
+  tpDfLocation:
+    description: Teleportiert dich zu einer Spawn-Location.
+  endPoint:
+    description: Setzt eine Endpunkt-Location auf einer Deathmatch-Map.
+  tpEndPoint:
+    description: Teleportiert dich zu einer Endpunkt-Location.
+  practise:
+    description: Practise-Modus fuer Module.
+  items:
+    description: Legt die Items in den Truhen fest.
+  create:
+  resetjumpleague:

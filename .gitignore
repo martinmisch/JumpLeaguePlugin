@@ -1,0 +1,18 @@
+# --- Gradle ---
+.gradle/
+build/
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+out/
+
+# --- OS Dateien ---
+.DS_Store
+Thumbs.db
+
+# --- Logs ---
+*.log
+
+# --- Lokale Umgebungsdateien (optional) ---
+local.properties
