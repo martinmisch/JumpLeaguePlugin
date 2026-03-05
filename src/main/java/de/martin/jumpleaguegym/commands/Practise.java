@@ -14,17 +14,21 @@ public class Practise implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (args.length == 1) {
                 if (args[0].equals("leave")) {
-                    if (Main.getPlugin().getGame().getPractise().contains((Player)sender)) {
-                        Main.getPlugin().getGame().getPractise().leave((Player)sender);
+                    if (Main.getPlugin().getGame().getPractise().contains((Player) sender)) {
+                        Main.getPlugin().getGame().getPractise().leave((Player) sender);
                     }
                 } else {
                     try {
                         int n = Integer.parseInt(args[0]);
-                        if (!Main.getPlugin().getGame().getPractise().contains((Player)sender)) {
-                            Main.getPlugin().getGame().getPractise().join(p, n - 1);
+                        if (!Main.getPlugin().getGame().getPractise().contains((Player) sender)) {
+                            if (n > 0 && n <= Main.getPlugin().getGame().getCj().getNumberOfBuildModules()) {
+                                Main.getPlugin().getGame().getPractise().join(p, n - 1);
+                            } else {
+                                p.sendMessage("§e[JLG] Dieses Modul existiert nicht.");
+                            }
                         }
                     } catch (Exception var7) {
                         p.sendMessage("§e[JLG] §f/practise leave --> Verlassen");

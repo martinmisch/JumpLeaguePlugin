@@ -17,7 +17,7 @@ public class TpLobby implements CommandExecutor {
         } else if (!sender.hasPermission("Tp")) {
             return false;
         } else {
-            ((Player)sender).teleport(new Location(Bukkit.getWorld("world"), -100.0, 51.0, 0.0, 180.0F, 15.0F));
+            ((Player) sender).teleport(new Location(Bukkit.getWorld("world"), -100.0, 51.0, 0.0, 180.0F, 15.0F));
             return true;
         }
     }

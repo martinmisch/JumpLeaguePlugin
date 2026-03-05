@@ -7,14 +7,12 @@ import de.martin.jumpleaguegym.utils.CreateItem;
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class CreateInventory implements Listener {
     private static Inventory inv;
@@ -87,7 +85,6 @@ public class CreateInventory implements Listener {
                             inv.getItem(13).setAmount(1);
                         }
 
-                        game.setAnzahlSpieler(inv.getItem(13).getAmount());
                     } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals("Jump-Zeit (min)")) {
                         inv.getItem(15).setAmount(inv.getItem(15).getAmount() + 1);
                         if (inv.getItem(15).getAmount() > 12) {
@@ -109,16 +106,6 @@ public class CreateInventory implements Listener {
                         }
 
                         game.setAnzahlItemsChest(inv.getItem(17).getAmount());
-                    } else if (e.getCurrentItem().getItemMeta().getDisplayName().equals("Soup")) {
-                        if (game.isSoup()) {
-                            game.setSoup(false);
-                            inv.getItem(18).removeEnchantment(Enchantment.UNBREAKING);
-                        } else {
-                            game.setSoup(true);
-                            ItemMeta im = inv.getItem(18).getItemMeta();
-                            im.addEnchant(Enchantment.UNBREAKING, 1, true);
-                            inv.getItem(18).setItemMeta(im);
-                        }
                     }
 
                     if (e.getCurrentItem().getItemMeta().getDisplayName().equals("Bestaetigen")) {
@@ -128,10 +115,7 @@ public class CreateInventory implements Listener {
 
                     e.setCancelled(true);
                 }
-
-
             }
         }
     }
 }
-

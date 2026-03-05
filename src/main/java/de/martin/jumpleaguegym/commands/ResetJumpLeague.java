@@ -16,7 +16,7 @@ public class ResetJumpLeague implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (!p.hasPermission("Reset.Siismonmon")) {
                 return false;
             } else {

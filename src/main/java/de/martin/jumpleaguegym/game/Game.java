@@ -16,14 +16,14 @@ import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
 public class Game {
     private static GameStates gs;
     private static ServerStatus status;
-    private final JlPlayer[] players;
+    private final List<JlPlayer> players;
     private ArrayList<Player> opPlayers;
     private final Random rand = new Random();
     private final CreateJump cj;
@@ -37,25 +37,21 @@ public class Game {
     private int anzahlLeicht;
     private int anzahlMittel;
     private int anzahlSchwer;
-    private int anzahlSpieler;
     private int jumpZeit;
     private int pvpZeit;
     private int map;
-    private boolean soup;
 
     public Game() {
         gs = GameStates.LOBBY;
         status = ServerStatus.STARTING;
         Bukkit.getWorld("world").setDifficulty(Difficulty.EASY);
-        this.opPlayers = new ArrayList();
+        this.opPlayers = new ArrayList<Player>();
         this.anzahlLeicht = 4;
         this.anzahlMittel = 3;
         this.anzahlSchwer = 3;
         this.jumpZeit = 10;
         this.pvpZeit = 5;
         this.anzahlItemsChest = 5;
-        this.anzahlSpieler = 6;
-        this.soup = false;
         this.cj = new CreateJump();
         this.map = this.rand.nextInt(Main.getPlugin().getTpM().getMapAnzahl()) + 1;
 
@@ -65,7 +61,7 @@ public class Game {
 
         this.practise = new PractiseMode();
         this.chI = new ChestItems();
-        this.players = new JlPlayer[12];
+        this.players = new LinkedList<JlPlayer>();
         this.lp = new LobbyPhase();
         this.jp = new JumpPhase();
         this.pp = new PvpPhase();
@@ -82,11 +78,7 @@ public class Game {
     }
 
     public void reset() {
-        JlPlayer[] var4;
-        int var3 = (var4 = this.getPlayers()).length;
-
-        for(int var2 = 0; var2 < var3; ++var2) {
-            JlPlayer p = var4[var2];
+        for (JlPlayer p : this.players) {
             if (p != null) {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
                 out.writeUTF("Connect");
@@ -95,17 +87,14 @@ public class Game {
             }
         }
 
-        this.anzahlItemsChest = 4;
-        this.anzahlSpieler = 6;
-        this.soup = false;
+        this.anzahlItemsChest = 5;
         this.anzahlLeicht = 4;
         this.anzahlMittel = 3;
         this.anzahlSchwer = 3;
         this.jumpZeit = 8;
         this.pvpZeit = 5;
         this.map = this.rand.nextInt(2) + 1;
-        this.opPlayers = new ArrayList();
-        Arrays.fill(this.players, (Object)null);
+        this.opPlayers = new ArrayList<Player>();
         this.cj.reset();
         this.lp.reset();
         this.jp.reset();
@@ -116,78 +105,71 @@ public class Game {
     }
 
     public boolean joinGame(Player p) {
-        if (this.containsPlayer(p)) {
-            return false;
-        } else {
-            for(int i = 0; i < this.players.length; ++i) {
-                if (this.players[i] == null) {
-                    this.players[i] = new JlPlayer(p);
-                    this.players[i].getPlayer().setScoreboard(this.getLp().getScL().getScB());
-                    return true;
-                }
-            }
-
-            return false;
+        if (!containsPlayer(p)) {
+            this.players.add(new JlPlayer(p, getSmallestFreeIndex()));
+            p.setScoreboard(this.getLp().getScL().getScB());
+            return true;
         }
-    }
-
-    public void deOpPlayers() {
-        for(int i = 0; i < this.players.length; ++i) {
-            if (this.players[i] != null && !this.players[i].getPlayer().getName().equals("12345_M2") && this.players[i].getPlayer().isOp()) {
-                this.players[i].getPlayer().setOp(false);
-                this.opPlayers.add(this.players[i].getPlayer());
-            }
-        }
-
-    }
-
-    public void opPlayers() {
-        Iterator var2 = this.opPlayers.iterator();
-
-        while(var2.hasNext()) {
-            Player p = (Player)var2.next();
-            p.setOp(true);
-        }
-
-    }
-
-    public boolean containsPlayer(Player p) {
-        for(int i = 0; i < this.players.length; ++i) {
-            if (this.players[i] != null && this.players[i].getPlayer().equals(p)) {
-                return true;
-            }
-        }
-
         return false;
     }
 
-    public int getPlayerIndex(Player p) {
-        for(int i = 0; i < this.players.length; ++i) {
-            if (this.players[i] == null) {
-                return -1;
-            }
+    private int getSmallestFreeIndex() {
+        int i = 0;
+        List<Integer> usedIndexes = players.stream().map(JlPlayer::getPlayerIndex).toList();
 
-            if (this.players[i].getPlayer().equals(p)) {
-                return i;
-            }
+        while (usedIndexes.contains(i)) {
+            i++;
         }
-
-        return -1;
+        return i;
     }
 
-    public int getJoinedPlayers() {
-        int i = 0;
-        JlPlayer[] var5;
-        int var4 = (var5 = this.players).length;
+    public boolean leaveGame(Player p) {
+        return this.players.remove(new JlPlayer(p, -1));
+    }
 
-        for(int var3 = 0; var3 < var4; ++var3) {
-            JlPlayer p = var5[var3];
-            if (p != null) {
-                ++i;
+    public void deOpPlayers() {
+        for (Player p : this.players.stream().map(JlPlayer::getPlayer).toList()) {
+            if (p.isOp()) {
+                p.setOp(false);
+                this.opPlayers.add(p);
             }
         }
+    }
 
-        return i;
+    public void opPlayers() {
+        players.forEach(p -> p.getPlayer().setOp(true));
+    }
+
+    public boolean containsPlayer(Player p) {
+        return this.players.stream().map(JlPlayer::getPlayer).toList().contains(p);
+    }
+
+    public boolean containsPlayer(JlPlayer p) {
+        return this.players.contains(p);
+    }
+
+    public JlPlayer getJlPlayerFromPlayer(Player p) {
+        return players.get(players.indexOf(new JlPlayer(p, -1)));
+    }
+
+    /**
+     * public int getPlayerIndex(Player p) {
+     * for (int i = 0; i < this.players.length; ++i) {
+     * if (this.players[i] == null) {
+     * return -1;
+     * }
+     * <p>
+     * if (this.players[i].getPlayer().equals(p)) {
+     * return i;
+     * }
+     * }
+     * <p>
+     * return -1;
+     * }
+     **/
+
+    public int getJoinedPlayers() {
+        return this.players.size();
     }
 
     public static GameStates getGs() {
@@ -218,7 +200,7 @@ public class Game {
         return this.wp;
     }
 
-    public JlPlayer[] getPlayers() {
+    public List<JlPlayer> getPlayers() {
         return this.players;
     }
 
@@ -258,14 +240,6 @@ public class Game {
         this.anzahlSchwer = anzahlSchwer;
     }
 
-    public int getAnzahlSpieler() {
-        return this.anzahlSpieler;
-    }
-
-    public void setAnzahlSpieler(int anzahlSpieler) {
-        this.anzahlSpieler = anzahlSpieler;
-    }
-
     public ChestItems getChI() {
         return this.chI;
     }
@@ -284,14 +258,6 @@ public class Game {
 
     public void setPvpZeit(int pvpZeit) {
         this.pvpZeit = pvpZeit;
-    }
-
-    public boolean isSoup() {
-        return this.soup;
-    }
-
-    public void setSoup(boolean soup) {
-        this.soup = soup;
     }
 
     public int getMap() {

@@ -17,7 +17,7 @@ public class TpDfLocation implements CommandExecutor {
         } else if (!sender.hasPermission("Tp")) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (args.length == 2) {
                 int nummer;
                 int map;

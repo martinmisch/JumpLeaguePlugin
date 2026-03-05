@@ -22,9 +22,13 @@ public class ChestItems implements Listener {
     public ChestItems() {
     }
 
-    public void openInv(Player p, ModulSchwierigkeit ms) {
-        this.inv = Bukkit.createInventory((InventoryHolder) null, 54, ms.name());
-        this.inv.setContents(Main.getPlugin().getChM().getItemList(ms));
+    public void openInv(Player p, ModulSchwierigkeit ms, int nummer) {
+        this.inv = Bukkit.createInventory((InventoryHolder) null, 54, ms.name() + " " + nummer);
+        ItemStack[] stack = Main.getPlugin().getChM().getItemList(ms, nummer);
+        for (int i = 0; i < 10; i++) {
+            System.out.println("i: " + stack[i].getType().toString());
+        }
+        this.inv.setContents(Main.getPlugin().getChM().getItemList(ms, nummer));
         p.openInventory(this.inv);
     }
 
@@ -33,26 +37,26 @@ public class ChestItems implements Listener {
         ItemStack[] temp = new ItemStack[27];
 
         int anzahlInChest = anzahl - r.nextInt(2);
-        // Create list 0–26 and 0-53
+        // Create list 0–26 and 0-108
         List<Integer> numbers27 = new ArrayList<>();
-        List<Integer> numbers54 = new ArrayList<>();
+        List<Integer> numbers108 = new ArrayList<>();
         for (int i = 0; i < 27; i++) {
             numbers27.add(i);
         }
-        for (int i = 0; i < 54; i++) {
-            numbers54.add(i);
+        for (int i = 0; i < 108; i++) {
+            numbers108.add(i);
         }
 
         // Shuffle
         Collections.shuffle(numbers27, r);
-        Collections.shuffle(numbers54, r);
+        Collections.shuffle(numbers108, r);
 
         // Take first anzahlInChest
         int[] chestPositions = new int[anzahlInChest];
         int[] savedPositions = new int[anzahlInChest];
         for (int i = 0; i < anzahlInChest; i++) {
             chestPositions[i] = numbers27.get(i);
-            savedPositions[i] = numbers54.get(i);
+            savedPositions[i] = numbers108.get(i);
         }
 
         ItemStack[] items = Main.getPlugin().getChM().getItemList(ms);
@@ -66,12 +70,12 @@ public class ChestItems implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent e) {
-        if (e.getView().getTitle().equals(ModulSchwierigkeit.LEICHT.name())) {
-            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.LEICHT);
-        } else if (e.getView().getTitle().equals(ModulSchwierigkeit.MITTEL.name())) {
-            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.MITTEL);
-        } else if (e.getView().getTitle().equals(ModulSchwierigkeit.SCHWER.name())) {
-            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.SCHWER);
+        if (e.getView().getTitle().contains(ModulSchwierigkeit.LEICHT.name())) {
+            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.LEICHT, Integer.parseInt("" + e.getView().getTitle().charAt(e.getView().getTitle().length() - 1)));
+        } else if (e.getView().getTitle().contains(ModulSchwierigkeit.MITTEL.name())) {
+            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.MITTEL, Integer.parseInt("" + e.getView().getTitle().charAt(e.getView().getTitle().length() - 1)));
+        } else if (e.getView().getTitle().contains(ModulSchwierigkeit.SCHWER.name())) {
+            Main.getPlugin().getChM().saveItems(e.getInventory().getContents(), ModulSchwierigkeit.SCHWER, Integer.parseInt("" + e.getView().getTitle().charAt(e.getView().getTitle().length() - 1)));
         }
 
     }

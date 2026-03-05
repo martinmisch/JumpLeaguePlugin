@@ -10,23 +10,27 @@ import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class ScoreBoardJump {
     private Scoreboard scB;
     private Game game;
     private Objective sideBar;
-    ArrayList<JlPlayer> sortedPlayers;
     private String preTime;
-    private String[] preProzent;
+    private List<String> preProzent;
+
+    private List<JlPlayer> players;
+
 
     public ScoreBoardJump() {
     }
 
     public void setScoreBoard() {
         this.game = Main.getPlugin().getGame();
+        this.players = game.getPlayers();
         this.scB = Bukkit.getScoreboardManager().getNewScoreboard();
-        this.preProzent = new String[this.game.getPlayers().length];
+        this.preProzent = new LinkedList<>();
         this.sideBar = this.scB.registerNewObjective("time", "dummy");
         this.sideBar.setDisplaySlot(DisplaySlot.SIDEBAR);
         this.sideBar.setDisplayName("§c[JLG] §f");
@@ -34,30 +38,26 @@ public class ScoreBoardJump {
         this.preTime = "§7Zeit: ";
         this.sideBar.getScore(this.preTime).setScore(15);
 
-        for(int i = 0; i < this.game.getPlayers().length; ++i) {
-            if (this.game.getPlayers()[i] == null) {
-                this.preProzent[i] = "";
-            } else {
-                this.preProzent[i] = "§f" + this.game.getPlayers()[i].getPlayer().getName() + " §7(0%)";
-                this.game.getPlayers()[i].getPlayer().setScoreboard(this.scB);
-            }
-        }
-
+        preProzent.addAll(players.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(0%)").toList());
+        players.forEach(p -> p.getPlayer().setScoreboard(this.scB));
     }
 
     public void update(int time) {
-        this.sortedPlayers = ScoreBoardSort.getSortedProzent(this.game.getPlayers());
         this.sideBar.getScoreboard().resetScores(this.preTime);
         this.preTime = "§7Zeit: §a" + TimeFormat.getTime(time);
         this.sideBar.getScore(this.preTime).setScore(15);
 
-        for(int i = 0; i < this.sortedPlayers.size(); ++i) {
-            this.sideBar.getScoreboard().resetScores(this.preProzent[i]);
-            if (this.sortedPlayers.get(i) != null) {
-                this.preProzent[i] = "§f" + ((JlPlayer)this.sortedPlayers.get(i)).getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(((JlPlayer)this.sortedPlayers.get(i)).getPlayer()) + "%)";
-                this.sideBar.getScore(this.preProzent[i]).setScore(i);
-            }
+        for (String s : preProzent) {
+            this.sideBar.getScoreboard().resetScores(s);
         }
+        preProzent.clear();
 
+        List<JlPlayer> sortedPlayers = ScoreBoardSort.getSortedProzent(players);
+        preProzent.addAll(sortedPlayers.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(p.getPlayer()) + "%)").toList());
+
+
+        for (int i = 0; i < preProzent.size(); i++) {
+            this.sideBar.getScore(preProzent.get(i)).setScore(i);
+        }
     }
 }

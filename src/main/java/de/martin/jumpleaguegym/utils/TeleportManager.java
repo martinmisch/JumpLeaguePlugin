@@ -41,13 +41,13 @@ public class TeleportManager {
             list = new ArrayList();
         }
 
-        for(int i = 0; i < ((List)list).size(); ++i) {
-            if (((String)((List)list).get(i)).startsWith(name)) {
-                ((List)list).remove(i);
+        for (int i = 0; i < ((List) list).size(); ++i) {
+            if (((String) ((List) list).get(i)).startsWith(name)) {
+                ((List) list).remove(i);
             }
         }
 
-        ((List)list).add(s);
+        ((List) list).add(s);
         cfg.set("EndPoints" + map, list);
 
         try {
@@ -62,9 +62,9 @@ public class TeleportManager {
         if (nummer > 0 && nummer <= 3) {
             List<String> list = getCfg().getStringList("EndPoints" + map);
 
-            for(int k = 0; k < list.size(); ++k) {
-                if (((String)list.get(k)).startsWith("end" + nummer)) {
-                    Location loc = new Location(Bukkit.getWorld(((String)list.get(k)).split(":")[1]), Double.valueOf(((String)list.get(k)).split(":")[2]), Double.valueOf(((String)list.get(k)).split(":")[3]), Double.valueOf(((String)list.get(k)).split(":")[4]));
+            for (int k = 0; k < list.size(); ++k) {
+                if (((String) list.get(k)).startsWith("end" + nummer)) {
+                    Location loc = new Location(Bukkit.getWorld(((String) list.get(k)).split(":")[1]), Double.valueOf(((String) list.get(k)).split(":")[2]), Double.valueOf(((String) list.get(k)).split(":")[3]), Double.valueOf(((String) list.get(k)).split(":")[4]));
                     return loc;
                 }
             }
@@ -83,13 +83,13 @@ public class TeleportManager {
             list = new ArrayList();
         }
 
-        for(int i = 0; i < ((List)list).size(); ++i) {
-            if (((String)((List)list).get(i)).startsWith(name)) {
-                ((List)list).remove(i);
+        for (int i = 0; i < ((List) list).size(); ++i) {
+            if (((String) ((List) list).get(i)).startsWith(name)) {
+                ((List) list).remove(i);
             }
         }
 
-        ((List)list).add(s);
+        ((List) list).add(s);
         cfg.set("DfLocs" + map, list);
 
         try {
@@ -104,9 +104,9 @@ public class TeleportManager {
         if (nummer > 0 && nummer <= 10) {
             List<String> list = getCfg().getStringList("DfLocs" + map);
 
-            for(int k = 0; k < list.size(); ++k) {
-                if (((String)list.get(k)).startsWith("df" + nummer)) {
-                    Location loc = new Location(Bukkit.getWorld(((String)list.get(k)).split(":")[1]), Double.valueOf(((String)list.get(k)).split(":")[2]), Double.valueOf(((String)list.get(k)).split(":")[3]), Double.valueOf(((String)list.get(k)).split(":")[4]), Float.valueOf(((String)list.get(k)).split(":")[5]), Float.valueOf(((String)list.get(k)).split(":")[6]));
+            for (int k = 0; k < list.size(); ++k) {
+                if (((String) list.get(k)).startsWith("df" + nummer)) {
+                    Location loc = new Location(Bukkit.getWorld(((String) list.get(k)).split(":")[1]), Double.valueOf(((String) list.get(k)).split(":")[2]), Double.valueOf(((String) list.get(k)).split(":")[3]), Double.valueOf(((String) list.get(k)).split(":")[4]), Float.valueOf(((String) list.get(k)).split(":")[5]), Float.valueOf(((String) list.get(k)).split(":")[6]));
                     return loc;
                 }
             }
@@ -118,7 +118,7 @@ public class TeleportManager {
     public int getMapAnzahl() {
         int i = 0;
 
-        for(int k = 1; k <= 100; ++k) {
+        for (int k = 1; k <= 100; ++k) {
             List<String> list = getCfg().getStringList("DfLocs" + k);
             if (list == null || list.size() <= 0) {
                 break;

@@ -20,14 +20,18 @@ public class ChestItemsCommand implements CommandExecutor {
         } else if (!sender.hasPermission("lol")) {
             return false;
         } else {
-            Player p = (Player)sender;
-            if (args.length == 1) {
+            Player p = (Player) sender;
+            if (args.length == 2) {
                 ModulSchwierigkeit ms = ModulSchwierigkeit.valueOf(args[0].toUpperCase());
-                Main.getPlugin().getGame().getChI().openInv(p, ms);
+                int nummer = Integer.parseInt(args[1]);
+                if (nummer < 1 || nummer > 2) {
+                    p.sendMessage("§e[JLG] §f/items [leicht / mittel / schwer] [1 / 2]");
+                    return false;
+                }
+                Main.getPlugin().getGame().getChI().openInv(p, ms, nummer);
             } else {
-                p.sendMessage("§e[JLG] §f/items [leicht / mittel / schwer]");
+                p.sendMessage("§e[JLG] §f/items [leicht / mittel / schwer] [1 / 2]");
             }
-
             return true;
         }
     }

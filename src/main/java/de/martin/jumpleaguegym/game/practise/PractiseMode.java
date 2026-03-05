@@ -17,8 +17,8 @@ public class PractiseMode {
     }
 
     public boolean contains(Player p) {
-        for(int i = 0; i < this.players.size(); ++i) {
-            if (((PractiseModePlayer)this.players.get(i)).getPlayer().equals(p)) {
+        for (int i = 0; i < this.players.size(); ++i) {
+            if (((PractiseModePlayer) this.players.get(i)).getPlayer().equals(p)) {
                 return true;
             }
         }
@@ -27,8 +27,8 @@ public class PractiseMode {
     }
 
     public int getIndex(Player p) {
-        for(int i = 0; i < this.players.size(); ++i) {
-            if (((PractiseModePlayer)this.players.get(i)).getPlayer().equals(p)) {
+        for (int i = 0; i < this.players.size(); ++i) {
+            if (((PractiseModePlayer) this.players.get(i)).getPlayer().equals(p)) {
                 return i;
             }
         }
@@ -39,8 +39,8 @@ public class PractiseMode {
     public void join(Player p, int modul) {
         this.game = Main.getPlugin().getGame();
 
-        for(int i = 0; i < this.players.size(); ++i) {
-            if (((PractiseModePlayer)this.players.get(i)).getPlayer().equals(p)) {
+        for (int i = 0; i < this.players.size(); ++i) {
+            if (((PractiseModePlayer) this.players.get(i)).getPlayer().equals(p)) {
                 p.sendMessage("§e[JLG] §fVerlasse erst den Practise-Mode (/practise leave).");
                 return;
             }
@@ -48,13 +48,13 @@ public class PractiseMode {
 
         this.players.add(new PractiseModePlayer(p, modul));
         p.setGameMode(GameMode.ADVENTURE);
-        p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.5, (double)(((PractiseModePlayer)this.game.getPractise().getPlayers().get(this.game.getPractise().getIndex(p))).getModul() * 50), 270.0F, 15.0F));
-        p.sendMessage("§e[JLG] §fDu übst nun Modul " + modul + ".");
+        p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.5, (double) (((PractiseModePlayer) this.game.getPractise().getPlayers().get(this.game.getPractise().getIndex(p))).getModul() * 50), 270.0F, 15.0F));
+        p.sendMessage("§e[JLG] §fDu übst nun Modul " + (modul + 1) + ".");
     }
 
     public void leave(Player p) {
-        for(int i = 0; i < this.players.size(); ++i) {
-            if (((PractiseModePlayer)this.players.get(i)).getPlayer().equals(p)) {
+        for (int i = 0; i < this.players.size(); ++i) {
+            if (((PractiseModePlayer) this.players.get(i)).getPlayer().equals(p)) {
                 this.players.remove(i);
                 p.sendMessage("§e[JLG] §fDu bist nun nicht mehr im Practise-Mode.");
                 return;

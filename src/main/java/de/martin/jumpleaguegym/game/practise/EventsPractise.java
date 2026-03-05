@@ -28,7 +28,7 @@ public class EventsPractise implements Listener {
         Player p = e.getPlayer();
         if (this.game.getPractise().contains(p)) {
             if (p.getLocation().getY() <= 25.0) {
-                p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.5, (double)(((PractiseModePlayer)this.pm.getPlayers().get(this.pm.getIndex(p))).getModul() * 50), 270.0F, 15.0F));
+                p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.5, (double) (((PractiseModePlayer) this.pm.getPlayers().get(this.pm.getIndex(p))).getModul() * 50), 270.0F, 15.0F));
             }
 
         }
@@ -37,7 +37,7 @@ public class EventsPractise implements Listener {
     @EventHandler
     public void onFoodChange(FoodLevelChangeEvent e) {
         if (e.getEntity() instanceof Player) {
-            if (this.game.getPractise().contains((Player)e.getEntity())) {
+            if (this.game.getPractise().contains((Player) e.getEntity())) {
                 ;
             }
         }
@@ -46,7 +46,7 @@ public class EventsPractise implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         if (e.getEntity() instanceof Player) {
-            if (this.game.getPractise().contains((Player)e.getEntity())) {
+            if (this.game.getPractise().contains((Player) e.getEntity())) {
                 e.setCancelled(true);
             }
         }

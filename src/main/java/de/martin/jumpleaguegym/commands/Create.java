@@ -19,12 +19,11 @@ public class Create implements CommandExecutor {
             return false;
         } else {
             if (Game.getGs().equals(GameStates.LOBBY)) {
-                Main.getPlugin().getGame().getLp().openCreateInv((Player)sender);
+                Main.getPlugin().getGame().getLp().openCreateInv((Player) sender);
                 System.out.println("create");
             } else {
                 sender.sendMessage("§e[JLG] §fDu kannst gerade kein Spiel erstellen.");
             }
-
             return true;
         }
     }

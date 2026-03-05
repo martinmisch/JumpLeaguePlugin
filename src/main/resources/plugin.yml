@@ -27,4 +27,6 @@ commands:
   items:
     description: Legt die Items in den Truhen fest.
   create:
+    description: Erstellt das Jump and Run.
   resetjumpleague:
+    description: Setzt das Jump and Run zurück.

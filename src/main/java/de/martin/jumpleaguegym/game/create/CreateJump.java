@@ -9,14 +9,15 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
 public class CreateJump {
+
+    private final int MAX_ANZAHL_SPIELER = 6;
     private Location[] modulEnds;
     private Random rand = new Random();
     private int endX;
@@ -34,10 +35,12 @@ public class CreateJump {
     double currentX = 200.0;
     double currentY = 100.0;
     double currentZ = 0.0;
-    private ArrayList<Integer> leichtModule = new ArrayList();
-    private ArrayList<Integer> mittelModule = new ArrayList();
-    private ArrayList<Integer> schwerModule = new ArrayList();
+    private ArrayList<Integer> leichtModule = new ArrayList<>();
+    private ArrayList<Integer> mittelModule = new ArrayList<>();
+    private ArrayList<Integer> schwerModule = new ArrayList<>();
     private Game game;
+
+    private int numberOfBuildModules = 0;
 
     public void reset() {
         this.modulX = 0;
@@ -46,12 +49,12 @@ public class CreateJump {
         this.currentX = 200.0;
         this.currentY = 100.0;
         this.currentZ = 0.0;
-        this.leichtModule = new ArrayList();
-        this.mittelModule = new ArrayList();
-        this.schwerModule = new ArrayList();
+        this.leichtModule = new ArrayList<>();
+        this.mittelModule = new ArrayList<>();
+        this.schwerModule = new ArrayList<>();
         this.getModulSchwierigkeit();
         this.endX = 0;
-        Arrays.fill(this.modulEnds, (Object)null);
+        Arrays.fill(this.modulEnds, (Object) null);
     }
 
     public CreateJump() {
@@ -60,9 +63,9 @@ public class CreateJump {
 
     private void getModulSchwierigkeit() {
         World world = Bukkit.getServer().getWorld("world");
-        Location loc = new Location(world, (double)this.modulX, (double)this.modulY, (double)this.modulZ);
+        Location loc = new Location(world, (double) this.modulX, (double) this.modulY, (double) this.modulZ);
 
-        for(boolean running = true; running; loc.add(0.0, 0.0, 50.0)) {
+        for (boolean running = true; running; loc.add(0.0, 0.0, 50.0)) {
             if (world.getBlockAt(loc).getType().equals(Material.GOLD_BLOCK)) {
                 this.leichtModule.add(loc.getBlockZ() / 50);
             } else if (world.getBlockAt(loc).getType().equals(Material.IRON_BLOCK)) {
@@ -75,6 +78,7 @@ public class CreateJump {
         }
 
         System.out.println("Leicht: " + this.leichtModule.size() + " Mittel: " + this.mittelModule.size() + " Schwer: " + this.schwerModule.size());
+        numberOfBuildModules = leichtModule.size() + mittelModule.size() + schwerModule.size();
     }
 
     public void create() {
@@ -83,65 +87,66 @@ public class CreateJump {
         System.out.println("Leicht: " + this.game.getAnzahlLeicht() + " mittel " + this.game.getAnzahlMittel() + " schwer " + this.game.getAnzahlSchwer());
         World world = Bukkit.getServer().getWorld("world");
         this.modulEnds = new Location[10];
+
+        long zeit1 = System.currentTimeMillis();
+
         this.buildModules(this.getZufallModule(this.leichtModule, this.game.getAnzahlLeicht()), 0, ModulSchwierigkeit.LEICHT);
         this.buildModules(this.getZufallModule(this.mittelModule, this.game.getAnzahlMittel()), this.game.getAnzahlLeicht(), ModulSchwierigkeit.MITTEL);
         this.buildModules(this.getZufallModule(this.schwerModule, this.game.getAnzahlSchwer()), this.game.getAnzahlLeicht() + this.game.getAnzahlMittel(), ModulSchwierigkeit.SCHWER);
-        this.endX = (int)this.currentX;
+        this.endX = (int) this.currentX;
 
-        for(int i = 1; i < this.game.getAnzahlSpieler() + 1; ++i) {
-            world.getBlockAt(new Location(world, this.currentX, this.currentY, this.currentZ + (double)(i * 50))).setType(Material.EMERALD_BLOCK);
-            world.getBlockAt(new Location(world, this.currentX, this.currentY + 1.0, this.currentZ + (double)(i * 50))).setType(Material.STONE_PRESSURE_PLATE);
+        long zeit2 = System.currentTimeMillis();
+        long benoetigt = zeit2 - zeit1;
+        System.out.println((benoetigt / 1000) + "s " + (benoetigt % 1000) + "m");
+
+        for (int i = 1; i <= MAX_ANZAHL_SPIELER; ++i) {
+            world.getBlockAt((int) this.currentX, (int) this.currentY, (int) this.currentZ + (i * 50)).setType(Material.EMERALD_BLOCK);
+            world.getBlockAt((int) this.currentX, (int) this.currentY + 1, (int) this.currentZ + (i * 50)).setType(Material.STONE_PRESSURE_PLATE);
         }
 
         Game.setGs(GameStates.CREATED);
         Game.setStatus(ServerStatus.JOIN);
     }
 
-    private ArrayList<Integer> getZufallModule(ArrayList<Integer> mod, int anzahl) {
-        ArrayList<Integer> temp = new ArrayList();
+    private List<Integer> getZufallModule(List<Integer> mod, int anzahl) {
 
-        for(int k = 0; k < anzahl; ++k) {
-            boolean running = true;
+        List<Integer> copy = new ArrayList<>(mod);
+        Collections.shuffle(copy, rand);
 
-            while(running) {
-                int i = this.rand.nextInt(mod.size());
-                if (!temp.contains(mod.get(i))) {
-                    temp.add((Integer)mod.get(i));
-                    running = false;
-                }
-            }
-        }
-
-        return temp;
+        return copy.subList(0, anzahl);
     }
 
 
-    private void buildModules(ArrayList<Integer> module, int anzahlVorhanden, ModulSchwierigkeit ms) {
+    private void buildModules(List<Integer> module, int anzahlVorhanden, ModulSchwierigkeit ms) {
         this.game = Main.getPlugin().getGame();
         World world = Bukkit.getServer().getWorld("world");
 
-        for(int h = 0; h < module.size(); ++h) {
-            this.modulZ = (Integer)module.get(h) * 50;
+        for (int modulNummer = 0; modulNummer < module.size(); modulNummer++) {
+            this.modulZ = (Integer) module.get(modulNummer) * 50;
 
             label53:
-            for(int i = 0; i < 100; ++i) {
-                for(int k = 0; k < 50; ++k) {
-                    for(int l = 0; l < 50; ++l) {
-                        Location locJump = new Location(world, this.currentX + (double)i, this.currentY + (double)k - 20.0, this.currentZ + (double)l - 25.0);
-                        Location locModul = new Location(world, (double)(this.modulX + i), (double)(this.modulY + k - 20), (double)(this.modulZ + l - 25));
+            for (int x = 0; x < 100; ++x) {
+                for (int y = 0; y < 50; ++y) {
+                    for (int z = 0; z < 50; ++z) {
+                        Block modulBlock = world.getBlockAt(this.modulX + x, this.modulY + y - 20, this.modulZ + z - 25);
+                        if (modulBlock.getType() == Material.AIR) {
+                            continue;
+                        }
+                        Location locJump = new Location(world, this.currentX + (double) x, this.currentY + (double) y - 20.0, this.currentZ + (double) z - 25.0);
+                        for (int m = 0; m < MAX_ANZAHL_SPIELER; m++) {
+                            Block currentBlock = world.getBlockAt(locJump.add(0.0, 0.0, 50.0));
 
-                        for(int m = 0; m < this.game.getAnzahlSpieler(); ++m) {
-                            world.getBlockAt(locJump.add(0.0, 0.0, 50.0)).setType(world.getBlockAt(locModul).getType());
-                            world.getBlockAt(locJump).setBlockData(world.getBlockAt(locModul).getBlockData());
-                            if (world.getBlockAt(locJump).getType().equals(Material.CHEST)) {
-                                Chest c = (Chest)world.getBlockAt(locJump).getState();
+                            currentBlock.setType(modulBlock.getType());
+                            currentBlock.setBlockData(modulBlock.getBlockData());
+                            if (currentBlock.getType().equals(Material.CHEST)) {
+                                Chest c = (Chest) currentBlock.getState();
                                 ItemStack[] items1 = this.game.getChI().getRandomItems(ms, this.game.getAnzahlItemsChest());
                                 c.getBlockInventory().setContents(items1);
                             }
                         }
 
-                        locJump.subtract(0.0, 0.0, (double)(50 * this.game.getAnzahlSpieler()));
-                        if (world.getBlockAt(locModul).getType().equals(Material.LAPIS_BLOCK) && (int)world.getBlockAt(locModul).getLocation().getX() != (int)this.currentX) {
+                        locJump.subtract(0.0, 0.0, (double) (50 * MAX_ANZAHL_SPIELER));
+                        if (modulBlock.getType().equals(Material.LAPIS_BLOCK) && (int) modulBlock.getLocation().getX() != (int) this.currentX) {
                             this.currentX = locJump.getX();
                             this.currentY = locJump.getY();
                             this.currentZ = locJump.getZ();
@@ -151,13 +156,13 @@ public class CreateJump {
                 }
             }
 
-            this.modulEnds[h + anzahlVorhanden] = new Location(world, this.currentX, this.currentY + 1.0, this.currentZ);
+            this.modulEnds[modulNummer + anzahlVorhanden] = new Location(world, this.currentX, this.currentY + 1.0, this.currentZ);
             int offset = 0;
             if (ms == ModulSchwierigkeit.MITTEL)
-                    offset = 4;
+                offset = 4;
             else if (ms == ModulSchwierigkeit.SCHWER)
                 offset = 7;
-            System.out.println("Modul " + (h + 1 + offset) + " erstellt.");
+            System.out.println("Modul " + (modulNummer + 1 + offset) + " erstellt.");
         }
 
     }
@@ -165,10 +170,10 @@ public class CreateJump {
     private void clearJumpArea() {
         World world = Bukkit.getServer().getWorld("world");
 
-        for(int i = 0; i < 900; ++i) {
-            for(int k = 0; k < 150; ++k) {
-                for(int l = 0; l < 350; ++l) {
-                    world.getBlockAt(new Location(world, (double)(200 + i), (double)(100 + k - 25), (double)(50 + l - 25))).setType(Material.AIR);
+        for (int i = 0; i < 900; ++i) {
+            for (int k = 0; k < 150; ++k) {
+                for (int l = 0; l < 350; ++l) {
+                    world.getBlockAt(200 + i, 100 + k - 25, 50 + l - 25).setType(Material.AIR);
                 }
             }
         }
@@ -197,5 +202,9 @@ public class CreateJump {
 
     public Location[] getModulEnds() {
         return this.modulEnds;
+    }
+
+    public int getNumberOfBuildModules() {
+        return numberOfBuildModules;
     }
 }

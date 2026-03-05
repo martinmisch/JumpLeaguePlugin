@@ -3,6 +3,7 @@ package de.martin.jumpleaguegym.game.lobby;
 import de.martin.jumpleaguegym.ServerStatus;
 import de.martin.jumpleaguegym.game.Game;
 import de.martin.jumpleaguegym.game.GameStates;
+import de.martin.jumpleaguegym.game.JlPlayer;
 import de.martin.jumpleaguegym.main.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -34,8 +35,8 @@ public class LobbyPhase implements CommandExecutor {
         this.game.getCj().create();
         Iterator var2 = Bukkit.getWorld("world").getEntities().iterator();
 
-        while(var2.hasNext()) {
-            Entity e = (Entity)var2.next();
+        while (var2.hasNext()) {
+            Entity e = (Entity) var2.next();
             if (e instanceof Item) {
                 e.remove();
             }
@@ -72,19 +73,10 @@ public class LobbyPhase implements CommandExecutor {
                 public void run() {
                     Bukkit.broadcastMessage("§c[JLG] §fDie Runde startet in " + this.countdown + " Sekunden.");
 
-                    int i;
-                    for(i = 0; i < LobbyPhase.this.game.getPlayers().length; ++i) {
-                        if (LobbyPhase.this.game.getPlayers()[i] != null) {
-                            System.out.println("setLÖevel" + this.countdown);
-                            LobbyPhase.this.game.getPlayers()[i].getPlayer().setLevel(this.countdown);
-                        }
-                    }
-
-                    if (this.countdown == 5) {
-                        for(i = 0; i < LobbyPhase.this.game.getPlayers().length; ++i) {
-                            if (LobbyPhase.this.game.getPlayers()[i] != null) {
-                                LobbyPhase.this.game.getPlayers()[i].getPlayer().sendTitle("§bJump-League", "");
-                            }
+                    for (JlPlayer p : LobbyPhase.this.game.getPlayers()) {
+                        p.getPlayer().setLevel(this.countdown);
+                        if (this.countdown == 5) {
+                            p.getPlayer().sendTitle("§bJump-League", "");
                         }
                     }
 
@@ -102,7 +94,7 @@ public class LobbyPhase implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command arg1, String arg2, String[] arg3) {
         if (Game.getGs().equals(GameStates.LOBBY) && sender instanceof Player) {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             CreateInventory.openInventory(p);
         }
 

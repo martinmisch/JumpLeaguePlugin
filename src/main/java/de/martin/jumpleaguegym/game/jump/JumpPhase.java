@@ -6,14 +6,17 @@ import de.martin.jumpleaguegym.game.JlPlayer;
 import de.martin.jumpleaguegym.main.Main;
 import de.martin.jumpleaguegym.utils.CreateItem;
 import org.bukkit.*;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.List;
 
 public class JumpPhase {
     private int taskID;
     private Game game;
     private ScoreBoardJump scJ;
     private boolean zielErreicht;
-    private JlPlayer[] players;
+    private List<JlPlayer> players;
 
     public JumpPhase() {
     }
@@ -26,19 +29,17 @@ public class JumpPhase {
         World world = Bukkit.getServer().getWorld("world");
         this.scJ = new ScoreBoardJump();
         this.scJ.setScoreBoard();
-        System.out.println("countdown start");
 
-        for(int i = 0; i < this.players.length; ++i) {
-            if (this.players[i] != null && this.game.containsPlayer(this.players[i].getPlayer())) {
-                this.players[i].getPlayer().setGameMode(GameMode.ADVENTURE);
-                this.players[i].getPlayer().getInventory().clear();
-                this.players[i].getPlayer().getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE), new ItemStack(Material.LEATHER_HELMET)});
-                this.players[i].getPlayer().getInventory().setItem(0, new ItemStack(Material.WOODEN_AXE));
-                this.players[i].setPlayerCheckPointLocation(new Location(world, (double)this.game.getCj().getJumpStartX() + 0.5, (double)(this.game.getCj().getJumpStartY() + 1), (double)(this.game.getCj().getJumpStartZ() + 50 * i) + 0.5, 270.0F, 15.0F));
-                this.players[i].getPlayer().teleport(new Location(world, (double)this.game.getCj().getJumpStartX() + 0.5, (double)Main.getPlugin().getGame().getCj().getJumpStartY() + 1.5, (double)Main.getPlugin().getGame().getCj().getJumpStartZ() + 0.5 + (double)(50 * i), 270.0F, 15.0F));
-                this.players[i].getPlayer().getInventory().setItem(8, (new CreateItem("Zuruecksetzen", Material.BARRIER, 1)).getItemStack());
-                this.players[i].getPlayer().setFoodLevel(20);
-            }
+        for (JlPlayer jp : players) {
+            Player p = jp.getPlayer();
+            p.setGameMode(GameMode.ADVENTURE);
+            p.getInventory().clear();
+            p.getInventory().setArmorContents(new ItemStack[]{new ItemStack(Material.LEATHER_BOOTS), new ItemStack(Material.LEATHER_LEGGINGS), new ItemStack(Material.LEATHER_CHESTPLATE), new ItemStack(Material.LEATHER_HELMET)});
+            p.getInventory().setItem(0, new ItemStack(Material.WOODEN_AXE));
+            jp.setPlayerCheckPointLocation(new Location(world, (double) this.game.getCj().getJumpStartX() + 0.5, (double) (this.game.getCj().getJumpStartY() + 1), (double) (this.game.getCj().getJumpStartZ() + 50 * jp.getPlayerIndex()) + 0.5, 270.0F, 15.0F));
+            p.teleport(new Location(world, (double) this.game.getCj().getJumpStartX() + 0.5, (double) Main.getPlugin().getGame().getCj().getJumpStartY() + 1.5, (double) Main.getPlugin().getGame().getCj().getJumpStartZ() + 0.5 + (double) (50 * jp.getPlayerIndex()), 270.0F, 15.0F));
+            p.getPlayer().getInventory().setItem(8, (new CreateItem("Zuruecksetzen", Material.BARRIER, 1)).getItemStack());
+            p.getPlayer().setFoodLevel(20);
         }
 
         Game.setGs(GameStates.JUMPCOUNT);
@@ -59,19 +60,12 @@ public class JumpPhase {
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
                     JumpPhase.this.jumpCountdown();
                 } else {
-                    JlPlayer[] var4;
-                    int var3 = (var4 = JumpPhase.this.game.getPlayers()).length;
-
-                    for(int var2 = 0; var2 < var3; ++var2) {
-                        JlPlayer p = var4[var2];
-                        if (p != null) {
-                            p.getPlayer().resetTitle();
-                            p.getPlayer().sendTitle("§a" + this.countdown, "");
-                            p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0F, 1.0F);
-                        }
+                    for (JlPlayer p : players) {
+                        p.getPlayer().resetTitle();
+                        p.getPlayer().sendTitle("§a" + this.countdown, "");
+                        p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_BASS, 1.0F, 1.0F);
                     }
                 }
-
                 --this.countdown;
             }
         }, 0L, 20L);
@@ -86,21 +80,14 @@ public class JumpPhase {
             }
 
             public void run() {
-                JlPlayer p;
-                int var2;
-                int var3;
-                JlPlayer[] var4;
+
                 if (this.countdown == JumpPhase.this.game.getJumpZeit() * 60) {
                     Bukkit.broadcastMessage("§c[JLG] §fDie Jumpphase beginnt.");
-                    var3 = (var4 = JumpPhase.this.players).length;
 
-                    for(var2 = 0; var2 < var3; ++var2) {
-                        p = var4[var2];
-                        if (p != null) {
-                            p.getPlayer().resetTitle();
-                            p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F);
-                        }
-                    }
+                    players.forEach(p -> {
+                        p.getPlayer().resetTitle();
+                        p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F);
+                    });
                 }
 
                 JumpPhase.this.scJ.update(this.countdown);
@@ -115,26 +102,11 @@ public class JumpPhase {
 
                 if (this.countdown <= 10) {
                     Bukkit.broadcastMessage("§c[JLG] §fDie Jumpphase endet in " + this.countdown + " Sekunden.");
-                    var3 = (var4 = JumpPhase.this.players).length;
-
-                    for(var2 = 0; var2 < var3; ++var2) {
-                        p = var4[var2];
-                        if (p != null) {
-                            p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 0.7F);
-                        }
-                    }
+                    players.forEach(p -> p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 0.7F));
                 }
 
                 if (this.countdown <= 0) {
-                    var3 = (var4 = JumpPhase.this.players).length;
-
-                    for(var2 = 0; var2 < var3; ++var2) {
-                        p = var4[var2];
-                        if (p != null) {
-                            p.getPlayer().getInventory().setItem(8, new ItemStack(Material.AIR));
-                        }
-                    }
-
+                    players.forEach(p -> p.getPlayer().getInventory().setItem(8, new ItemStack(Material.AIR)));
                     Game.setGs(GameStates.PVP);
                     Main.getPlugin().getGame().getPp().startGame();
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
@@ -146,19 +118,8 @@ public class JumpPhase {
     }
 
     public boolean win() {
-        int aliveCount = 0;
-
-        for(int i = 0; i < this.players.length; ++i) {
-            if (this.players[i] != null && this.players[i].isAlive()) {
-                ++aliveCount;
-            }
-        }
-
-        if (aliveCount <= 0) {
-            return true;
-        } else {
-            return false;
-        }
+        //TODO hier muss <= 1 gesetzt werden, damit die Runde endet, wenn während der Jumpphhase nur noch ein Spieler lebt
+        return players.stream().filter(JlPlayer::isAlive).toList().size() <= 0;
     }
 
     public boolean isZielErreicht() {

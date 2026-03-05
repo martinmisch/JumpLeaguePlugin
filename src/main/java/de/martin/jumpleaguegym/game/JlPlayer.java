@@ -5,20 +5,22 @@ import org.bukkit.entity.Player;
 
 public class JlPlayer {
     private Player p;
+
+    private int playerIndex;
     private boolean alive;
-    private boolean disconnected;
     private boolean zielErreicht;
     private int deathCount;
     private Location playerCheckPointLocation;
     private int playerCheckpointsNumber;
 
-    public JlPlayer(Player p) {
+
+    public JlPlayer(Player p, int playerIndex) {
         this.p = p;
         this.alive = true;
-        this.disconnected = false;
         this.zielErreicht = false;
         this.deathCount = 0;
         this.playerCheckpointsNumber = 0;
+        this.playerIndex = playerIndex;
     }
 
     public boolean isAlive() {
@@ -27,14 +29,6 @@ public class JlPlayer {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
-    }
-
-    public boolean isDisconnected() {
-        return this.disconnected;
-    }
-
-    public void setDisconnected(boolean disconnected) {
-        this.disconnected = disconnected;
     }
 
     public boolean isZielErreicht() {
@@ -72,4 +66,26 @@ public class JlPlayer {
     public void setDeathCount(int deathCount) {
         this.deathCount = deathCount;
     }
+
+    public int getPlayerIndex() {
+        return playerIndex;
+    }
+
+    public void setPlayerIndex(int playerIndex) {
+        this.playerIndex = playerIndex;
+    }
+
+    //JLPlayer werden nur anhand der Player verglichen
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JlPlayer other)) return false;
+        return p.equals(other.p);
+    }
+
+    @Override
+    public int hashCode() {
+        return p.hashCode();
+    }
+
 }

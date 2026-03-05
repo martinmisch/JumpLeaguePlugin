@@ -14,13 +14,12 @@ public class Hub implements CommandExecutor {
 
     public boolean onCommand(CommandSender sender, Command arg1, String arg2, String[] args) {
         if (sender instanceof Player) {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF("Connect");
             out.writeUTF("Lobby");
             p.sendPluginMessage(Main.getPlugin(), "BungeeCord", out.toByteArray());
         }
-
         return false;
     }
 }

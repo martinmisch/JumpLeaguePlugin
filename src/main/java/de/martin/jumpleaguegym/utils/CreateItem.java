@@ -26,8 +26,8 @@ public class CreateItem {
     }
 
     public CreateItem(String displayname, String skullOwner) {
-        this.is = new ItemStack(Material.valueOf("PLAYER_HEAD"), 1, (short)3);
-        this.sm = (SkullMeta)this.is.getItemMeta();
+        this.is = new ItemStack(Material.valueOf("PLAYER_HEAD"), 1, (short) 3);
+        this.sm = (SkullMeta) this.is.getItemMeta();
         this.sm.setDisplayName(displayname);
         this.sm.setOwner(skullOwner);
     }

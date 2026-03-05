@@ -11,7 +11,7 @@ public class Start implements CommandExecutor {
     }
 
     public boolean onCommand(CommandSender sender, Command arg1, String arg2, String[] arg3) {
-        Main.getPlugin().getGame().getLp().startGame((Player)sender);
+        Main.getPlugin().getGame().getLp().startGame((Player) sender);
         return false;
     }
 }

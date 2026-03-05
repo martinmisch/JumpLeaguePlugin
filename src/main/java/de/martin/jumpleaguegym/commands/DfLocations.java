@@ -16,7 +16,7 @@ public class DfLocations implements CommandExecutor {
         } else if (!sender.hasPermission("DfPoint")) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (args.length == 2) {
                 int nummer;
                 int map;
@@ -37,7 +37,6 @@ public class DfLocations implements CommandExecutor {
             } else {
                 p.sendMessage("§e[JLG] §f/dfLocation [map-nr 1-100] [nummer 1 - 10]");
             }
-
             return true;
         }
     }

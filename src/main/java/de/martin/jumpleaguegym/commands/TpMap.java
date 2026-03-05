@@ -15,7 +15,7 @@ public class TpMap implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (!sender.hasPermission("Tp")) {
                 return false;
             } else {

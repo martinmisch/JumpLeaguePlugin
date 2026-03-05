@@ -15,14 +15,14 @@ public class TpModul implements CommandExecutor {
         if (!(sender instanceof Player)) {
             return false;
         } else {
-            Player p = (Player)sender;
+            Player p = (Player) sender;
             if (!sender.hasPermission("Tp")) {
                 return false;
             } else {
                 if (args.length == 1) {
                     try {
                         int i = Integer.valueOf(args[0]);
-                        p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.0, (double)(50 * (i - 1)) + 0.5, 270.0F, 15.0F));
+                        p.teleport(new Location(Bukkit.getWorld("world"), 0.5, 51.0, (double) (50 * (i - 1)) + 0.5, 270.0F, 15.0F));
                     } catch (Exception var7) {
                         p.sendMessage("§e[JLG] §f/modul [nummer 1,2,3,...]");
                     }
