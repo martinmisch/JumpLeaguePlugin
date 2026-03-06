@@ -43,7 +43,7 @@ public class ScoreBoardPvp {
 
     public void update(int time) {
         this.sideBar.getScoreboard().resetScores(this.preTime);
-        this.preTime = "§7Zeit: §a" + TimeFormat.getTime(time);
+        this.preTime = "§7Zeit: §a" + TimeFormat.getTimeSM(time);
         this.sideBar.getScore(this.preTime).setScore(15);
 
         for (String s : preLeben) {

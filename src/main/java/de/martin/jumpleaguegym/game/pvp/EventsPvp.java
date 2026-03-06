@@ -151,7 +151,7 @@ public class EventsPvp implements Listener {
     @EventHandler
     public void onCloseInv(InventoryCloseEvent e) {
         if (e.getInventory() instanceof EnchantingInventory) {
-            e.getInventory().setItem(1, (ItemStack) null);
+            e.getInventory().setItem(1, null);
         }
     }
 
@@ -167,7 +167,6 @@ public class EventsPvp implements Listener {
                         Chest c = (Chest) Bukkit.getWorld("world").getBlockAt(((LootChest) lootChest.get(i)).getLocation()).getState();
                         if (c.getBlockInventory().equals(e.getClickedInventory())) {
                             ((LootChest) lootChest.get(i)).setTaken(((LootChest) lootChest.get(i)).getTaken() + 1);
-                            System.out.println("InvClick Chest");
                         }
                     }
                 }

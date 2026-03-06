@@ -87,6 +87,7 @@ public class JumpPhase {
                     players.forEach(p -> {
                         p.getPlayer().resetTitle();
                         p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 1.0F);
+                        p.setSystemTimeLastCheckpoint(System.currentTimeMillis());
                     });
                 }
 

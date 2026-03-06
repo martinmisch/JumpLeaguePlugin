@@ -25,9 +25,6 @@ public class ChestItems implements Listener {
     public void openInv(Player p, ModulSchwierigkeit ms, int nummer) {
         this.inv = Bukkit.createInventory((InventoryHolder) null, 54, ms.name() + " " + nummer);
         ItemStack[] stack = Main.getPlugin().getChM().getItemList(ms, nummer);
-        for (int i = 0; i < 10; i++) {
-            System.out.println("i: " + stack[i].getType().toString());
-        }
         this.inv.setContents(Main.getPlugin().getChM().getItemList(ms, nummer));
         p.openInventory(this.inv);
     }

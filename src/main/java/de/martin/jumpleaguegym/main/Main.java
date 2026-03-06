@@ -11,6 +11,7 @@ import de.martin.jumpleaguegym.game.practise.EventsPractise;
 import de.martin.jumpleaguegym.game.pvp.EventsPvp;
 import de.martin.jumpleaguegym.game.win.EventsWin;
 import de.martin.jumpleaguegym.utils.ChestItemManager;
+import de.martin.jumpleaguegym.utils.ModulRekorde;
 import de.martin.jumpleaguegym.utils.TeleportManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -25,6 +26,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
     private PluginManager pm;
     private TeleportManager tpM;
     private ChestItemManager chM;
+
+    private ModulRekorde modulRekorde;
     private Events events;
     private Game game;
 
@@ -39,6 +42,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         this.tpM = new TeleportManager(this);
         this.game = new Game();
         this.chM = new ChestItemManager(this);
+        this.modulRekorde = new ModulRekorde(this);
         this.events = new Events();
         this.pm.registerEvents(this.events, this);
         this.pm.registerEvents(new EventsLobby(), this);
@@ -85,5 +89,9 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 
     public ChestItemManager getChM() {
         return this.chM;
+    }
+
+    public ModulRekorde getModulRekorde() {
+        return modulRekorde;
     }
 }

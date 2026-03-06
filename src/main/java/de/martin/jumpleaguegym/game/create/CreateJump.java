@@ -11,6 +11,8 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -38,6 +40,7 @@ public class CreateJump {
     private ArrayList<Integer> leichtModule = new ArrayList<>();
     private ArrayList<Integer> mittelModule = new ArrayList<>();
     private ArrayList<Integer> schwerModule = new ArrayList<>();
+    private ArrayList<Integer> generierteModulnummern = new ArrayList<>();
     private Game game;
 
     private int numberOfBuildModules = 0;
@@ -55,6 +58,7 @@ public class CreateJump {
         this.getModulSchwierigkeit();
         this.endX = 0;
         Arrays.fill(this.modulEnds, (Object) null);
+        generierteModulnummern.clear();
     }
 
     public CreateJump() {
@@ -82,13 +86,13 @@ public class CreateJump {
     }
 
     public void create() {
-        this.clearJumpArea();
         this.game = Main.getPlugin().getGame();
-        System.out.println("Leicht: " + this.game.getAnzahlLeicht() + " mittel " + this.game.getAnzahlMittel() + " schwer " + this.game.getAnzahlSchwer());
+        System.out.println("---Leicht: " + this.game.getAnzahlLeicht() + " mittel " + this.game.getAnzahlMittel() + " schwer " + this.game.getAnzahlSchwer());
         World world = Bukkit.getServer().getWorld("world");
         this.modulEnds = new Location[10];
 
         long zeit1 = System.currentTimeMillis();
+        this.clearJumpArea();
 
         this.buildModules(this.getZufallModule(this.leichtModule, this.game.getAnzahlLeicht()), 0, ModulSchwierigkeit.LEICHT);
         this.buildModules(this.getZufallModule(this.mittelModule, this.game.getAnzahlMittel()), this.game.getAnzahlLeicht(), ModulSchwierigkeit.MITTEL);
@@ -102,6 +106,8 @@ public class CreateJump {
         for (int i = 1; i <= MAX_ANZAHL_SPIELER; ++i) {
             world.getBlockAt((int) this.currentX, (int) this.currentY, (int) this.currentZ + (i * 50)).setType(Material.EMERALD_BLOCK);
             world.getBlockAt((int) this.currentX, (int) this.currentY + 1, (int) this.currentZ + (i * 50)).setType(Material.STONE_PRESSURE_PLATE);
+
+
         }
 
         Game.setGs(GameStates.CREATED);
@@ -120,10 +126,15 @@ public class CreateJump {
     private void buildModules(List<Integer> module, int anzahlVorhanden, ModulSchwierigkeit ms) {
         this.game = Main.getPlugin().getGame();
         World world = Bukkit.getServer().getWorld("world");
+        int offset = 0;
+        if (ms == ModulSchwierigkeit.MITTEL)
+            offset = 4;
+        else if (ms == ModulSchwierigkeit.SCHWER)
+            offset = 7;
 
         for (int modulNummer = 0; modulNummer < module.size(); modulNummer++) {
             this.modulZ = (Integer) module.get(modulNummer) * 50;
-
+            this.generierteModulnummern.add(module.get(modulNummer));
             label53:
             for (int x = 0; x < 100; ++x) {
                 for (int y = 0; y < 50; ++y) {
@@ -132,9 +143,23 @@ public class CreateJump {
                         if (modulBlock.getType() == Material.AIR) {
                             continue;
                         }
+
                         Location locJump = new Location(world, this.currentX + (double) x, this.currentY + (double) y - 20.0, this.currentZ + (double) z - 25.0);
                         for (int m = 0; m < MAX_ANZAHL_SPIELER; m++) {
                             Block currentBlock = world.getBlockAt(locJump.add(0.0, 0.0, 50.0));
+                            if(x == 0 && y == 20 && z == 25) {
+                                String farbe = "§a";
+                                if(ms.equals(ModulSchwierigkeit.MITTEL)) {
+                                    farbe = "§e";
+                                }
+                                if(ms.equals(ModulSchwierigkeit.SCHWER)) {
+                                    farbe = "§c";
+                                }
+                                floatingText(locJump.add(2, 2.7, 0.5), "§fModul §c" + (modulNummer + offset + 1));
+                                locJump.subtract(2, 2.7, 0.5);
+                                floatingText(locJump.add(2, 2.4, 0.5), "§f Schwierigkeit: " + farbe + ms);
+                                locJump.subtract(2, 2.4, 0.5);
+                            }
 
                             currentBlock.setType(modulBlock.getType());
                             currentBlock.setBlockData(modulBlock.getBlockData());
@@ -157,27 +182,38 @@ public class CreateJump {
             }
 
             this.modulEnds[modulNummer + anzahlVorhanden] = new Location(world, this.currentX, this.currentY + 1.0, this.currentZ);
-            int offset = 0;
-            if (ms == ModulSchwierigkeit.MITTEL)
-                offset = 4;
-            else if (ms == ModulSchwierigkeit.SCHWER)
-                offset = 7;
             System.out.println("Modul " + (modulNummer + 1 + offset) + " erstellt.");
         }
 
     }
 
+    private void floatingText(Location l, String text) {
+        World world = Bukkit.getServer().getWorld("world");
+        ArmorStand stand = (ArmorStand) world.spawnEntity(l, EntityType.ARMOR_STAND);
+        stand.setInvisible(true);
+        stand.setMarker(true);
+        stand.setGravity(false);
+        stand.setCustomName(text);
+        stand.setCustomNameVisible(true);
+        stand.setArms(false);
+        stand.setBasePlate(false);
+        stand.setSmall(true);
+        stand.setCollidable(false);
+    }
+
     private void clearJumpArea() {
         World world = Bukkit.getServer().getWorld("world");
-
-        for (int i = 0; i < 900; ++i) {
-            for (int k = 0; k < 150; ++k) {
-                for (int l = 0; l < 350; ++l) {
-                    world.getBlockAt(200 + i, 100 + k - 25, 50 + l - 25).setType(Material.AIR);
+        for (int i = 0; i < 750; ++i) {
+            for (int k = 0; k < 170; ++k) {
+                for (int l = 0; l < 330; ++l) {
+                    world.getBlockAt(200 + i, 75 + k, 10 + l).setType(Material.AIR);
                 }
             }
         }
-
+        Collection<ArmorStand> texts = world.getEntitiesByClass(ArmorStand.class);
+        for (ArmorStand a : texts) {
+            a.remove();
+        }
     }
 
     public int getJumpStartX() {
@@ -206,5 +242,9 @@ public class CreateJump {
 
     public int getNumberOfBuildModules() {
         return numberOfBuildModules;
+    }
+
+    public ArrayList<Integer> getGenerierteModulnummern() {
+        return generierteModulnummern;
     }
 }

@@ -5,6 +5,7 @@ import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.game.JlPlayer;
 import de.martin.jumpleaguegym.main.Main;
 import de.martin.jumpleaguegym.utils.CreateItem;
+import de.martin.jumpleaguegym.utils.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -85,20 +86,45 @@ public class EventsJump implements Listener {
         JlPlayer jumpP = game.getJlPlayerFromPlayer(p);
 
         if (e.getAction().equals(Action.PHYSICAL)) {
+
             if ((double) ((int) p.getLocation().getX()) > jumpP.getPlayerCheckPointLocation().getX() + 2.0) {
                 if (Bukkit.getWorld("world").getBlockAt(p.getLocation()).getType().equals(Material.STONE_PRESSURE_PLATE)) {
+                    long timeCheckpoint = System.currentTimeMillis();
+                    long benoetigteZeit = timeCheckpoint - jumpP.getSystemTimeLastCheckpoint();
+                    int beendetesModul = game.getCj().getGenerierteModulnummern().get(jumpP.getPlayerCheckpointsNumber());
+                    int alterRekord = Main.getPlugin().getModulRekorde().getModulRekord(jumpP.getPlayer().getName(), beendetesModul);
+                    jumpP.setSystemTimeLastCheckpoint(System.currentTimeMillis());
+                    p.sendMessage("§c[JLG] §fDu hast Modul §e" + (jumpP.getPlayerCheckpointsNumber() + 1) + "§f geschafft. \n§c[JLG]§f Benötigte Zeit: §e" + TimeFormat.getTimeMSM((int) benoetigteZeit) + "§f. \n");
+                    if(benoetigteZeit < alterRekord || alterRekord == -1) {
+                        Main.getPlugin().getModulRekorde().saveModulRekord(jumpP.getPlayer().getName(), beendetesModul, (int) benoetigteZeit);
+                        p.sendMessage("§c[JLG]§f Du hast einen neuen Modulrekord!");
+                    } else {
+                        p.sendMessage("§c[JLG]§f Dein Modulrekord liegt bei: §e" + TimeFormat.getTimeMSM(alterRekord) + "§f, das ist §e" + (benoetigteZeit - alterRekord)/ 1000 + "§fs schneller.");
+                    }
+
                     jumpP.setPlayerCheckPointLocation(new Location(Bukkit.getWorld("world"), (double) ((int) p.getLocation().getX()) + 0.5, (double) ((int) p.getLocation().getY()), (double) ((int) p.getLocation().getZ()) + 0.5, 270.0F, 15.0F));
                     jumpP.setPlayerCheckpointsNumber(jumpP.getPlayerCheckpointsNumber() + 1);
-                    p.sendMessage("§e[JLG] §fDu hast einen Checkpoint erreicht.");
                     p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                 } else {
                     for (int i = -1; i < 2; ++i) {
                         for (int k = -1; k < 2; ++k) {
                             for (int l = -1; l < 2; ++l) {
                                 if (Bukkit.getWorld("world").getBlockAt(p.getLocation().add((double) i, (double) k, (double) l)).getType().equals(Material.STONE_PRESSURE_PLATE)) {
+                                    long timeCheckpoint = System.currentTimeMillis();
+                                    long benoetigteZeit = timeCheckpoint - jumpP.getSystemTimeLastCheckpoint();
+                                    int beendetesModul = game.getCj().getGenerierteModulnummern().get(jumpP.getPlayerCheckpointsNumber());
+                                    int alterRekord = Main.getPlugin().getModulRekorde().getModulRekord(jumpP.getPlayer().getName(), beendetesModul);
+                                    jumpP.setSystemTimeLastCheckpoint(System.currentTimeMillis());
+                                    p.sendMessage("§c[JLG] §fDu hast Modul §e" + (jumpP.getPlayerCheckpointsNumber() + 1) + "§f geschafft. \n§c[JLG]§f Benötigte Zeit: §e" + TimeFormat.getTimeMSM((int) benoetigteZeit) + "§f. \n");
+                                    if(benoetigteZeit < alterRekord || alterRekord == -1) {
+                                        Main.getPlugin().getModulRekorde().saveModulRekord(jumpP.getPlayer().getName(), beendetesModul, (int) benoetigteZeit);
+                                        p.sendMessage("§c[JLG]§f Du hast einen neuen Modulrekord!");
+                                    } else {
+                                        p.sendMessage("§c[JLG]§f Dein Modulrekord liegt bei: §e" + TimeFormat.getTimeMSM(alterRekord) + "§f, das ist §e" + (benoetigteZeit - alterRekord)/ 1000 + "§fs schneller.");
+                                    }
+
                                     jumpP.setPlayerCheckPointLocation(new Location(Bukkit.getWorld("world"), (double) ((int) p.getLocation().getX() + i) + 0.5, (double) ((int) p.getLocation().getY() + k), (double) ((int) p.getLocation().getZ()) + 0.5 + (double) l, 270.0F, 15.0F));
                                     jumpP.setPlayerCheckpointsNumber(jumpP.getPlayerCheckpointsNumber() + 1);
-                                    p.sendMessage("§e[JLG] §fDu hast einen Checkpoint erreicht.");
                                     p.playSound(p.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 1.0F, 1.0F);
                                 }
                             }

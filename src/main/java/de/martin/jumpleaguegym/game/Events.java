@@ -90,7 +90,7 @@ public class Events implements Listener {
     public void onPlayerInteract(InventoryClickEvent e) {
         if (e.getView().getType() == InventoryType.ENCHANTING) {
             //Lapis darf nicht herausgenommen werden
-            if (e.getSlot() == 1) {
+            if (e.getSlot() == 1 && e.getClickedInventory().getType() == InventoryType.ENCHANTING) {
                 e.setCancelled(true);
             }
         }

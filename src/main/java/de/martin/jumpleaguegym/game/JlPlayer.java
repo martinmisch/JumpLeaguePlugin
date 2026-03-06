@@ -13,6 +13,8 @@ public class JlPlayer {
     private Location playerCheckPointLocation;
     private int playerCheckpointsNumber;
 
+    private long systemTimeLastCheckpoint;
+
 
     public JlPlayer(Player p, int playerIndex) {
         this.p = p;
@@ -73,6 +75,14 @@ public class JlPlayer {
 
     public void setPlayerIndex(int playerIndex) {
         this.playerIndex = playerIndex;
+    }
+
+    public long getSystemTimeLastCheckpoint() {
+        return systemTimeLastCheckpoint;
+    }
+
+    public void setSystemTimeLastCheckpoint(long systemTimeLastCheckpoint) {
+        this.systemTimeLastCheckpoint = systemTimeLastCheckpoint;
     }
 
     //JLPlayer werden nur anhand der Player verglichen
