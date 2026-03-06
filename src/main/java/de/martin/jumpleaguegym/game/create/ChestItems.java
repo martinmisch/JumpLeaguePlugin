@@ -3,6 +3,7 @@ package de.martin.jumpleaguegym.game.create;
 import de.martin.jumpleaguegym.game.ModulSchwierigkeit;
 import de.martin.jumpleaguegym.main.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,10 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class ChestItems implements Listener {
     private Inventory inv;
@@ -31,38 +29,33 @@ public class ChestItems implements Listener {
 
     public ItemStack[] getRandomItems(ModulSchwierigkeit ms, int anzahl) {
         Random r = new Random();
-        ItemStack[] temp = new ItemStack[27];
-
+        ItemStack[] returnInv = new ItemStack[27];
         int anzahlInChest = anzahl - r.nextInt(2);
-        // Create list 0–26 and 0-108
+
+        List<ItemStack> items = new ArrayList<>(Arrays.stream(Main.getPlugin().getChM().getItemList(ms)).toList());
+        Collections.shuffle(items, r);
+        Set<Material> seen = new HashSet<>();
+        items.removeIf(item -> !seen.add(item.getType()));
+        anzahlInChest = Math.min(anzahlInChest, items.size());
+
+        // Create list 0–26
         List<Integer> numbers27 = new ArrayList<>();
-        List<Integer> numbers108 = new ArrayList<>();
         for (int i = 0; i < 27; i++) {
             numbers27.add(i);
         }
-        for (int i = 0; i < 108; i++) {
-            numbers108.add(i);
-        }
-
-        // Shuffle
         Collections.shuffle(numbers27, r);
-        Collections.shuffle(numbers108, r);
 
         // Take first anzahlInChest
         int[] chestPositions = new int[anzahlInChest];
-        int[] savedPositions = new int[anzahlInChest];
         for (int i = 0; i < anzahlInChest; i++) {
             chestPositions[i] = numbers27.get(i);
-            savedPositions[i] = numbers108.get(i);
         }
-
-        ItemStack[] items = Main.getPlugin().getChM().getItemList(ms);
 
         for (int i = 0; i < anzahlInChest; i++) {
-            temp[chestPositions[i]] = items[savedPositions[i]];
+            returnInv[chestPositions[i]] = items.get(i);
         }
 
-        return temp;
+        return returnInv;
     }
 
     @EventHandler
