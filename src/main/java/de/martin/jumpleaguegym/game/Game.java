@@ -39,7 +39,7 @@ public class Game {
     private int anzahlSchwer;
     private int jumpZeit;
     private int pvpZeit;
-    private int map;
+    private String map;
 
     public Game() {
         gs = GameStates.LOBBY;
@@ -53,7 +53,12 @@ public class Game {
         this.pvpZeit = 5;
         this.anzahlItemsChest = 5;
         this.cj = new CreateJump();
-        this.map = this.rand.nextInt(Main.getPlugin().getTpM().getMapAnzahl()) + 1;
+        List<String> maps = Main.getPlugin().getTpM().getMaps();
+        if (!maps.isEmpty()) {
+            this.map = maps.get(rand.nextInt(maps.size()));
+        } else {
+            this.map = "";
+        }
 
         for (Player p : Bukkit.getOnlinePlayers()) {
             p.setScoreboard(Bukkit.getScoreboardManager().getNewScoreboard());
@@ -91,14 +96,13 @@ public class Game {
         this.anzahlLeicht = 4;
         this.anzahlMittel = 3;
         this.anzahlSchwer = 3;
-        this.jumpZeit = 8;
+        this.jumpZeit = 10;
         this.pvpZeit = 5;
-        this.map = this.rand.nextInt(2) + 1;
+        this.map = Main.getPlugin().getTpM().getMaps().get(rand.nextInt(Main.getPlugin().getTpM().getMaps().size()));
         this.opPlayers = new ArrayList<Player>();
         this.cj.reset();
         this.lp.reset();
         this.jp.reset();
-        this.pp.reset();
         gs = GameStates.LOBBY;
         status = ServerStatus.STARTING;
         this.lp.createGame();
@@ -260,11 +264,11 @@ public class Game {
         this.pvpZeit = pvpZeit;
     }
 
-    public int getMap() {
+    public String getMap() {
         return this.map;
     }
 
-    public void setMap(int map) {
+    public void setMap(String map) {
         this.map = map;
     }
 

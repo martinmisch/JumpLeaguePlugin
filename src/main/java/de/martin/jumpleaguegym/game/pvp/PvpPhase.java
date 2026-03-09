@@ -3,11 +3,13 @@ package de.martin.jumpleaguegym.game.pvp;
 import de.martin.jumpleaguegym.game.Game;
 import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.game.JlPlayer;
+import de.martin.jumpleaguegym.game.create.CreateJump;
 import de.martin.jumpleaguegym.main.Main;
 import de.martin.jumpleaguegym.utils.CreateItem;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,35 +19,31 @@ import java.util.Random;
 public class PvpPhase {
     private Game game;
     private List<JlPlayer> players;
-    private ArrayList<Location> cobwebs;
     private ScoreBoardPvp scP;
     private Random rand;
     private int taskID;
     private Location endPoint;
     private boolean beaconSpawned;
-    private Material preBeacon;
     private ArrayList<LootChest> lootChests;
 
     public PvpPhase() {
-    }
-
-    public void reset() {
-        this.preBeacon = null;
     }
 
     public void startGame() {
         this.beaconSpawned = false;
         this.endPoint = null;
         this.rand = new Random();
-        this.cobwebs = new ArrayList();
         this.lootChests = new ArrayList();
         this.scP = new ScoreBoardPvp();
         this.scP.setScoreBoard();
         this.game = Main.getPlugin().getGame();
         this.players = this.game.getPlayers();
 
+        Location pos1 = Main.getPlugin().getTpM().getBounds(game.getMap(), 1);
+        Vector relative = pos1.toVector().subtract(new Location(pos1.getWorld(), CreateJump.MAPLOCATIONX, CreateJump.MAPLOCATIONY, CreateJump.MAPLOCATIONZ).toVector());
+
         players.forEach(p -> {
-            p.getPlayer().teleport(Main.getPlugin().getTpM().getDfLocation(this.game.getMap(), p.getPlayerIndex() + 1));
+            p.getPlayer().teleport(Main.getPlugin().getTpM().getDfLocation(this.game.getMap(), p.getPlayerIndex() + 1).subtract(relative));
             p.getPlayer().setGameMode(GameMode.SURVIVAL);
             p.getPlayer().getPlayer().setHealth(20.0);
             p.getPlayer().getPlayer().setFoodLevel(20);
@@ -55,6 +53,9 @@ public class PvpPhase {
     }
 
     public void spawnLootChest(Location l, ItemStack[] items, ItemStack[] armor) {
+        if (l.getY() <= CreateJump.MAPLOCATIONY) {
+            return;
+        }
         this.lootChests.add(new LootChest(l, items));
         Bukkit.getWorld("world").getBlockAt(l).setType(Material.CHEST);
         Chest c = (Chest) Bukkit.getWorld("world").getBlockAt(l).getState();
@@ -87,17 +88,6 @@ public class PvpPhase {
                 Bukkit.getWorld("world").getBlockAt(lootChest.getLocation()).setType(Material.AIR);
             }
         }
-    }
-
-    public void removeLootChests() {
-        for (LootChest lootChest : this.lootChests) {
-            if (Bukkit.getWorld("world").getBlockAt(lootChest.getLocation()).getType().equals(Material.CHEST)) {
-                Chest c = (Chest) Bukkit.getWorld("world").getBlockAt(lootChest.getLocation()).getState();
-                c.getBlockInventory().clear();
-                Bukkit.getWorld("world").getBlockAt(lootChest.getLocation()).setType(Material.AIR);
-            }
-        }
-        this.lootChests = new ArrayList<>();
     }
 
     public boolean win() {
@@ -139,6 +129,12 @@ public class PvpPhase {
 
                 if (this.countdown == 60) {
                     PvpPhase.this.endPoint = Main.getPlugin().getTpM().getEndPoints(game.getMap(), PvpPhase.this.rand.nextInt(3) + 1);
+
+                    Location pos1 = Main.getPlugin().getTpM().getBounds(game.getMap(), 1);
+                    Vector relative = pos1.toVector().subtract(new Location(endPoint.getWorld(), CreateJump.MAPLOCATIONX, CreateJump.MAPLOCATIONY, CreateJump.MAPLOCATIONZ).toVector());
+
+                    PvpPhase.this.endPoint = endPoint.subtract(relative);
+
                     PvpPhase.this.createBeacon();
                     Bukkit.broadcastMessage("§c[JLG] §fDas Spiel endet in 60 Sekunden. Begebe dich zum Endpunkt.");
 
@@ -158,13 +154,9 @@ public class PvpPhase {
                     Bukkit.broadcastMessage("§c[JLG] §fDie PvP-Phase ist zu Ende.");
                     players.forEach(p -> p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 0.7F));
 
-                    PvpPhase.this.deleteCobwebs();
                     if (PvpPhase.this.beaconSpawned) {
                         PvpPhase.this.setEndPointAlive();
-                        PvpPhase.this.deleteBeacon();
                     }
-
-                    PvpPhase.this.removeLootChests();
                     Game.setGs(GameStates.WIN);
                     PvpPhase.this.game.getWp().startWin();
                     Bukkit.getScheduler().cancelTask(PvpPhase.this.taskID);
@@ -175,14 +167,9 @@ public class PvpPhase {
         }, 0L, 20L);
     }
 
-    public void deleteCobwebs() {
-        cobwebs.forEach(l -> Bukkit.getWorld("world").getBlockAt(l).setType(Material.AIR));
-    }
-
     public void createBeacon() {
         this.beaconSpawned = true;
         World w = Bukkit.getWorld("world");
-        this.preBeacon = w.getBlockAt(this.endPoint).getType();
         w.getBlockAt(this.endPoint).setType(Material.BEACON);
 
         for (int i = -1; i < 2; ++i) {
@@ -190,10 +177,6 @@ public class PvpPhase {
                 w.getBlockAt(new Location(w, this.endPoint.getX() + (double) i, this.endPoint.getY() - 1.0, this.endPoint.getZ() + (double) k)).setType(Material.IRON_BLOCK);
             }
         }
-    }
-
-    public void deleteBeacon() {
-        Bukkit.getWorld("world").getBlockAt(this.endPoint).setType(this.preBeacon);
     }
 
     public void setEndPointAlive() {
@@ -206,10 +189,6 @@ public class PvpPhase {
                 .orElse(null);
 
         players.stream().filter(p -> p != winner).forEach(p -> p.setAlive(false));
-    }
-
-    public ArrayList<Location> getCobwebs() {
-        return this.cobwebs;
     }
 
     public ArrayList<LootChest> getLootChests() {

@@ -1,7 +1,6 @@
 package de.martin.jumpleaguegym.utils;
 
 import de.martin.jumpleaguegym.main.Main;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -15,7 +14,7 @@ public class TeleportManager {
     private static File file;
 
     public TeleportManager(Main main) {
-        file = new File(main.getDataFolder(), "locations.yml");
+        file = new File(main.getDataFolder(), "mapLocations.yml");
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
@@ -31,104 +30,140 @@ public class TeleportManager {
         cfg = YamlConfiguration.loadConfiguration(file);
     }
 
-    public void saveEndPoint(String name, int map, Location location) {
-        String s = name + ":" + location.getWorld().getName() + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ();
-
-        Object list;
-        try {
-            list = cfg.getStringList("EndPoints" + map);
-        } catch (Exception var8) {
-            list = new ArrayList();
+    public boolean saveLocation(String mapName, String type, int number, Location location) {
+        if (!getMaps().contains(mapName)) {
+            return false;
         }
+        String path = mapName + "#" + type + "#" + number;
+        cfg.set(path, location);
 
-        for (int i = 0; i < ((List) list).size(); ++i) {
-            if (((String) ((List) list).get(i)).startsWith(name)) {
-                ((List) list).remove(i);
+        try {
+            cfg.save(file);
+        } catch (IOException var7) {
+            var7.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
+    public Location getLocation(String mapName, String type, int number) {
+        String path = mapName + "#" + type + "#" + number;
+        if (!cfg.contains(path)) {
+            return null;
+        }
+        return cfg.getLocation(path).clone();
+    }
+
+    public Location getDfLocation(String mapName, int number) {
+        if (number >= 1 && number <= 10) {
+            return getLocation(mapName, "spawnpoint", number);
+        }
+        return null;
+    }
+
+    public Location getEndPoints(String mapName, int number) {
+        if (number >= 1 && number <= 3) {
+            return getLocation(mapName, "endpoint", number);
+        }
+        return null;
+    }
+
+    public Location getBounds(String mapName, int number) {
+        if (number >= 1 && number <= 2) {
+            return getLocation(mapName, "bound", number);
+        }
+        return null;
+    }
+
+    public boolean saveMap(String mapname) {
+        List<String> maps;
+        if (!cfg.contains("maps")) {
+            maps = new ArrayList<>();
+        } else {
+            try {
+                maps = Base64Encoder.listFromBase64(cfg.getString("maps"), String.class);
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
 
-        ((List) list).add(s);
-        cfg.set("EndPoints" + map, list);
+        if (maps == null) {
+            maps = new ArrayList<String>();
+            maps.add(mapname);
+            try {
+                cfg.set("maps", Base64Encoder.listToBase64(maps));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return true;
+        }
+
+        if (maps.contains(mapname)) {
+            return false;
+        }
+        maps.add(mapname);
+        try {
+            cfg.set("maps", Base64Encoder.listToBase64(maps));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             cfg.save(file);
         } catch (IOException var7) {
             var7.printStackTrace();
         }
-
+        return true;
     }
 
-    public Location getEndPoints(int map, int nummer) {
-        if (nummer > 0 && nummer <= 3) {
-            List<String> list = getCfg().getStringList("EndPoints" + map);
+    public boolean deleteMap(String mapname) {
 
-            for (int k = 0; k < list.size(); ++k) {
-                if (((String) list.get(k)).startsWith("end" + nummer)) {
-                    Location loc = new Location(Bukkit.getWorld(((String) list.get(k)).split(":")[1]), Double.valueOf(((String) list.get(k)).split(":")[2]), Double.valueOf(((String) list.get(k)).split(":")[3]), Double.valueOf(((String) list.get(k)).split(":")[4]));
-                    return loc;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public void saveDfLocation(String name, int map, Location location) {
-        String s = name + ":" + location.getWorld().getName() + ":" + location.getX() + ":" + location.getY() + ":" + location.getZ() + ":" + location.getYaw() + ":" + location.getPitch();
-
-        Object list;
+        List<String> maps;
         try {
-            list = cfg.getStringList("DfLocs" + map);
-        } catch (Exception var8) {
-            list = new ArrayList();
+            maps = Base64Encoder.listFromBase64(cfg.getString("maps"), String.class);
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
-        for (int i = 0; i < ((List) list).size(); ++i) {
-            if (((String) ((List) list).get(i)).startsWith(name)) {
-                ((List) list).remove(i);
-            }
-        }
+        boolean deleted = maps.remove(mapname);
 
-        ((List) list).add(s);
-        cfg.set("DfLocs" + map, list);
+        try {
+            cfg.set("maps", Base64Encoder.listToBase64(maps));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         try {
             cfg.save(file);
         } catch (IOException var7) {
             var7.printStackTrace();
         }
-
+        return deleted;
     }
 
-    public Location getDfLocation(int map, int nummer) {
-        if (nummer > 0 && nummer <= 10) {
-            List<String> list = getCfg().getStringList("DfLocs" + map);
-
-            for (int k = 0; k < list.size(); ++k) {
-                if (((String) list.get(k)).startsWith("df" + nummer)) {
-                    Location loc = new Location(Bukkit.getWorld(((String) list.get(k)).split(":")[1]), Double.valueOf(((String) list.get(k)).split(":")[2]), Double.valueOf(((String) list.get(k)).split(":")[3]), Double.valueOf(((String) list.get(k)).split(":")[4]), Float.valueOf(((String) list.get(k)).split(":")[5]), Float.valueOf(((String) list.get(k)).split(":")[6]));
-                    return loc;
-                }
-            }
+    public List<String> getMaps() {
+        if (!cfg.contains("maps")) {
+            return new ArrayList<>();
+        }
+        List<String> maps;
+        try {
+            maps = Base64Encoder.listFromBase64(cfg.getString("maps"), String.class);
+        } catch (IOException | ClassNotFoundException e) {
+            return new ArrayList<>();
         }
 
-        return null;
+        if (maps == null) {
+            return new ArrayList<>();
+        }
+        return maps;
     }
 
     public int getMapAnzahl() {
-        int i = 0;
+        List<String> maps = getMaps();
+        int size = maps.size();
 
-        for (int k = 1; k <= 100; ++k) {
-            List<String> list = getCfg().getStringList("DfLocs" + k);
-            if (list == null || list.size() <= 0) {
-                break;
-            }
-
-            ++i;
-        }
-
-        System.out.println("Anzahl maps: " + i);
-        return i;
+        Main.getPlugin().getLogger().info("Anzahl Deathmatch-Maps: " + size);
+        return size;
     }
 
     public static YamlConfiguration getCfg() {

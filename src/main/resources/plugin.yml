@@ -6,22 +6,13 @@ api-version: '1.21'
 commands:
   hub:
     description: Teleportiert dich zurueck in die Lobby.
+    aliases: l
   lobby:
     description: Teleportiert dich zur Lobby.
   modul:
     description: Teleportiert dich zu einem Modul.
-  map:
-    description: Teleportiert dich zu einer Deathmatch-Map.
   start:
     description: Startet die Jump-League Runde.
-  dfLocation:
-    description: Setzt eine Spawn-Location auf einer Deathmatch-Map.
-  tpDfLocation:
-    description: Teleportiert dich zu einer Spawn-Location.
-  endPoint:
-    description: Setzt eine Endpunkt-Location auf einer Deathmatch-Map.
-  tpEndPoint:
-    description: Teleportiert dich zu einer Endpunkt-Location.
   practise:
     description: Practise-Modus fuer Module.
   items:
@@ -30,3 +21,9 @@ commands:
     description: Erstellt das Jump and Run.
   resetjumpleague:
     description: Setzt das Jump and Run zurück.
+  map:
+    description: Erstellt/Löscht Deathmatch-Maps.
+  mapLocation:
+    description: Speichert Deatchmatch Spawnpoints, bounds und Endpoints.
+  tpmapLocation:
+    description: Tp't zu Deatchmatch Spawnpoints, bounds und Endpoints.

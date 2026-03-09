@@ -3,6 +3,7 @@ package de.martin.jumpleaguegym.game.pvp;
 import de.martin.jumpleaguegym.game.Game;
 import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.game.JlPlayer;
+import de.martin.jumpleaguegym.game.create.CreateJump;
 import de.martin.jumpleaguegym.main.Main;
 import org.bukkit.*;
 import org.bukkit.block.Chest;
@@ -22,12 +23,9 @@ import org.bukkit.inventory.EnchantingInventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
-import java.util.stream.IntStream;
+import java.util.*;
 
 public class EventsPvp implements Listener {
     private final Random rand = new Random();
@@ -90,16 +88,21 @@ public class EventsPvp implements Listener {
 
     //Spawnpunkt mit größter Distanz zu allen Spielern zurückgeben
     public Location getRandPlayerLocation(Player p) {
-        return IntStream.rangeClosed(1, 10)
-                .mapToObj(i -> Main.getPlugin()
-                        .getTpM()
-                        .getDfLocation(game.getMap(), i))
-                .max(Comparator.comparingDouble(loc ->
-                        players.stream().mapToDouble(pl -> loc.distanceSquared(
-                                        pl.getPlayer().getLocation()))
-                                .min()
-                                .orElse(Double.MAX_VALUE)
-                )).orElse(null);
+        Location pos1 = Main.getPlugin().getTpM().getBounds(game.getMap(), 1);
+        Vector relative = pos1.toVector().subtract(new Location(Bukkit.getWorld("world"), CreateJump.MAPLOCATIONX, CreateJump.MAPLOCATIONY, CreateJump.MAPLOCATIONZ).toVector());
+
+        Location[] locations = new Location[10];
+        for (int i = 0; i < 10; i++) {
+            locations[i] = Main.getPlugin().getTpM().getDfLocation(game.getMap(), i + 1);
+            locations[i].subtract(relative);
+        }
+
+        return Arrays.stream(locations).max(Comparator.comparingDouble(loc ->
+                players.stream().mapToDouble(pl -> loc.distanceSquared(
+                                pl.getPlayer().getLocation()))
+                        .min()
+                        .orElse(Double.MAX_VALUE)
+        )).orElse(locations[0]);
     }
 
     @EventHandler
@@ -109,12 +112,8 @@ public class EventsPvp implements Listener {
                 if (e.getBlock().getType().equals(Material.TNT)) {
                     Bukkit.getWorld("world").getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
                     Bukkit.getWorld("world").spawn(e.getBlock().getLocation(), TNTPrimed.class).setFuseTicks(32);
-                } else {
-                    if (e.getBlock().getType().equals(Material.COBWEB)) {
-                        this.game.getPp().getCobwebs().add(e.getBlock().getLocation());
-                    } else {
-                        e.setCancelled(true);
-                    }
+                } else if (!e.getBlock().getType().equals(Material.COBWEB)) {
+                    e.setCancelled(true);
                 }
             }
         }

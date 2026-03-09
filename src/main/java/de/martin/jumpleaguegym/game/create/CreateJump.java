@@ -43,6 +43,11 @@ public class CreateJump {
     private ArrayList<Integer> generierteModulnummern = new ArrayList<>();
     private Game game;
 
+    public final static int MAPLOCATIONX = -500;
+    public final static int MAPLOCATIONY = 90;
+    public final static int MAPLOCATIONZ = -500;
+
+
     private int numberOfBuildModules = 0;
 
     public void reset() {
@@ -86,32 +91,35 @@ public class CreateJump {
     }
 
     public void create() {
+        long zeit1 = System.currentTimeMillis();
+
         this.game = Main.getPlugin().getGame();
         System.out.println("---Leicht: " + this.game.getAnzahlLeicht() + " mittel " + this.game.getAnzahlMittel() + " schwer " + this.game.getAnzahlSchwer());
+        System.out.println("Map: " + game.getMap());
         World world = Bukkit.getServer().getWorld("world");
         this.modulEnds = new Location[10];
 
-        long zeit1 = System.currentTimeMillis();
         this.clearJumpArea();
+        this.clearMapArea();
 
         this.buildModules(this.getZufallModule(this.leichtModule, this.game.getAnzahlLeicht()), 0, ModulSchwierigkeit.LEICHT);
         this.buildModules(this.getZufallModule(this.mittelModule, this.game.getAnzahlMittel()), this.game.getAnzahlLeicht(), ModulSchwierigkeit.MITTEL);
         this.buildModules(this.getZufallModule(this.schwerModule, this.game.getAnzahlSchwer()), this.game.getAnzahlLeicht() + this.game.getAnzahlMittel(), ModulSchwierigkeit.SCHWER);
         this.endX = (int) this.currentX;
 
-        long zeit2 = System.currentTimeMillis();
-        long benoetigt = zeit2 - zeit1;
-        System.out.println((benoetigt / 1000) + "s " + (benoetigt % 1000) + "m");
+        this.copyMap(game.getMap());
 
         for (int i = 1; i <= MAX_ANZAHL_SPIELER; ++i) {
             world.getBlockAt((int) this.currentX, (int) this.currentY, (int) this.currentZ + (i * 50)).setType(Material.EMERALD_BLOCK);
             world.getBlockAt((int) this.currentX, (int) this.currentY + 1, (int) this.currentZ + (i * 50)).setType(Material.STONE_PRESSURE_PLATE);
-
-
         }
 
         Game.setGs(GameStates.CREATED);
         Game.setStatus(ServerStatus.JOIN);
+
+        long zeit2 = System.currentTimeMillis();
+        long benoetigt = zeit2 - zeit1;
+        System.out.println((benoetigt / 1000) + "s " + (benoetigt % 1000) + "m");
     }
 
     private List<Integer> getZufallModule(List<Integer> mod, int anzahl) {
@@ -147,12 +155,12 @@ public class CreateJump {
                         Location locJump = new Location(world, this.currentX + (double) x, this.currentY + (double) y - 20.0, this.currentZ + (double) z - 25.0);
                         for (int m = 0; m < MAX_ANZAHL_SPIELER; m++) {
                             Block currentBlock = world.getBlockAt(locJump.add(0.0, 0.0, 50.0));
-                            if(x == 0 && y == 20 && z == 25) {
+                            if (x == 0 && y == 20 && z == 25) {
                                 String farbe = "§a";
-                                if(ms.equals(ModulSchwierigkeit.MITTEL)) {
+                                if (ms.equals(ModulSchwierigkeit.MITTEL)) {
                                     farbe = "§e";
                                 }
-                                if(ms.equals(ModulSchwierigkeit.SCHWER)) {
+                                if (ms.equals(ModulSchwierigkeit.SCHWER)) {
                                     farbe = "§c";
                                 }
                                 floatingText(locJump.add(2, 2.7, 0.5), "§fModul §c" + (modulNummer + offset + 1));
@@ -187,6 +195,29 @@ public class CreateJump {
 
     }
 
+    private void copyMap(String map) {
+        Location pos1 = Main.getPlugin().getTpM().getBounds(map, 1);
+        int pos1x = (int) pos1.x(), pos1y = (int) pos1.y(), pos1z = (int) pos1.z();
+        Location pos2 = Main.getPlugin().getTpM().getBounds(map, 2);
+        int pos2x = (int) pos2.x(), pos2y = (int) pos2.y(), pos2z = (int) pos2.z();
+        World world = Bukkit.getWorld("world");
+
+        for (int x = 0; x < Math.abs(pos2.x() - pos1.x()); x++) {
+            for (int y = 0; y < Math.abs(pos2.y() - pos1.y()); y++) {
+                for (int z = 0; z < Math.abs(pos2.z() - pos1.z()); z++) {
+                    Block mapBlock = world.getBlockAt(pos1x + x, pos1y + y, pos1z + z);
+                    if (mapBlock.getType() == Material.AIR) {
+                        continue;
+                    }
+                    Block currentBlock = world.getBlockAt(this.MAPLOCATIONX + x, this.MAPLOCATIONY + y, this.MAPLOCATIONZ + z);
+                    currentBlock.setType(mapBlock.getType());
+                    currentBlock.setBlockData(mapBlock.getBlockData());
+                }
+            }
+        }
+
+    }
+
     private void floatingText(Location l, String text) {
         World world = Bukkit.getServer().getWorld("world");
         ArmorStand stand = (ArmorStand) world.spawnEntity(l, EntityType.ARMOR_STAND);
@@ -201,12 +232,16 @@ public class CreateJump {
         stand.setCollidable(false);
     }
 
+
     private void clearJumpArea() {
         World world = Bukkit.getServer().getWorld("world");
         for (int i = 0; i < 750; ++i) {
             for (int k = 0; k < 170; ++k) {
                 for (int l = 0; l < 330; ++l) {
-                    world.getBlockAt(200 + i, 75 + k, 10 + l).setType(Material.AIR);
+                    Block b = world.getBlockAt(200 + i, 75 + k, 10 + l);
+                    if (b.getType() != Material.AIR) {
+                        b.setType(Material.AIR);
+                    }
                 }
             }
         }
@@ -214,6 +249,23 @@ public class CreateJump {
         for (ArmorStand a : texts) {
             a.remove();
         }
+        System.out.println("Jump-Area gecleared.");
+    }
+
+    private void clearMapArea() {
+        World world = Bukkit.getServer().getWorld("world");
+
+        for (int i = 0; i < 200; ++i) {
+            for (int k = 0; k < 100; ++k) {
+                for (int l = 0; l < 200; ++l) {
+                    Block b = world.getBlockAt(-500 + i, 90 + k, -500 + l);
+                    if (b.getType() != Material.AIR) {
+                        b.setType(Material.AIR);
+                    }
+                }
+            }
+        }
+        System.out.println("Map-Area gecleared.");
     }
 
     public int getJumpStartX() {

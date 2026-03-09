@@ -54,16 +54,14 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         this.pm.registerEvents(new ChestItems(), this);
         this.getCommand("lobby").setExecutor(new TpLobby());
         this.getCommand("modul").setExecutor(new TpModul());
-        this.getCommand("map").setExecutor(new TpMap());
+        this.getCommand("map").setExecutor(new Map());
+        this.getCommand("mapLocation").setExecutor(new MapLocation());
+        this.getCommand("tpmapLocation").setExecutor(new TpMapLocation());
         this.getCommand("create").setExecutor(new Create());
         this.getCommand("start").setExecutor(new Start());
         this.getCommand("resetjumpleague").setExecutor(new ResetJumpLeague());
-        this.getCommand("dfLocation").setExecutor(new DfLocations());
-        this.getCommand("tpDfLocation").setExecutor(new TpDfLocation());
         this.getCommand("practise").setExecutor(new Practise());
         this.getCommand("items").setExecutor(new ChestItemsCommand());
-        this.getCommand("endpoint").setExecutor(new EndPoint());
-        this.getCommand("tpendpoint").setExecutor(new TpEndPoint());
         this.getCommand("hub").setExecutor(new Hub());
         System.out.println("Plugin erfolgreich gestartet!");
     }
