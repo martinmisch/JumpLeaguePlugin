@@ -5,6 +5,7 @@ import de.martin.jumpleaguegym.game.Game;
 import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.game.ModulSchwierigkeit;
 import de.martin.jumpleaguegym.main.Main;
+import de.martin.jumpleaguegym.utils.TimeFormat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -167,6 +168,16 @@ public class CreateJump {
                                 locJump.subtract(2, 2.7, 0.5);
                                 floatingText(locJump.add(2, 2.4, 0.5), "§f Schwierigkeit: " + farbe + ms);
                                 locJump.subtract(2, 2.4, 0.5);
+
+                                String rekord = Main.getPlugin().getModulRekorde().getModulRekordAll(module.get(modulNummer));
+                                if (rekord.equalsIgnoreCase("---")) {
+                                    floatingText(locJump.add(2, 2.1, 0.5), "§f Modulrekord: §e---");
+                                    locJump.subtract(2, 2.4, 0.5);
+                                } else {
+                                    floatingText(locJump.add(2, 2.1, 0.5), "§f Modulrekord: §e" + TimeFormat.getTimeMSM(Main.getPlugin().getModulRekorde().getModulRekord(rekord, module.get(modulNummer))) + "§f von §8" + rekord);
+                                    locJump.subtract(2, 2.4, 0.5);
+                                }
+
                             }
 
                             currentBlock.setType(modulBlock.getType());
