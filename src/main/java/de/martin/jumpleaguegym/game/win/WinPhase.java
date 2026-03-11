@@ -45,13 +45,15 @@ public class WinPhase {
                         p.setFoodLevel(20);
                         p.sendTitle("§a" + s, "§ahat die Runde gewonnen.");
                     }
-                    game.opPlayers();
                 }
 
                 Bukkit.broadcastMessage("§c[JLG] §fDie Lobby startet in " + this.i + "s neu.");
                 if (this.i == 0) {
-                    game.reset();
+                    game.kickPlayers();
+                }
+                if (this.i == -1) {
                     Bukkit.getScheduler().cancelTask(WinPhase.this.taskID);
+                    Main.getPlugin().resetAndCreate();
                 }
 
                 --this.i;

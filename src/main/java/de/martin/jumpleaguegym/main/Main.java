@@ -31,6 +31,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
     private Events events;
     private Game game;
 
+    public int anzahlLeicht = 4, anzahlMittel = 3, anzahlSchwer = 3, jumpZeit = 10, pvpZeit = 5, maxChestItems = 5, anzahlSpieler = 6;
+
     public Main() {
     }
 
@@ -40,7 +42,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         this.getServer().getMessenger().registerIncomingPluginChannel(this, "BungeeCord", this);
         this.pm = Bukkit.getPluginManager();
         this.tpM = new TeleportManager(this);
-        this.game = new Game();
+        resetAndCreate();
         this.chM = new ChestItemManager(this);
         this.modulRekorde = new ModulRekorde(this);
         this.events = new Events();
@@ -64,6 +66,10 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         this.getCommand("items").setExecutor(new ChestItemsCommand());
         this.getCommand("hub").setExecutor(new Hub());
         System.out.println("Plugin erfolgreich gestartet!");
+    }
+
+    public void resetAndCreate() {
+        this.game = new Game(anzahlLeicht, anzahlMittel, anzahlSchwer, jumpZeit, pvpZeit, maxChestItems, anzahlSpieler);
     }
 
     public void onPluginMessageReceived(String arg0, Player arg1, byte[] arg2) {

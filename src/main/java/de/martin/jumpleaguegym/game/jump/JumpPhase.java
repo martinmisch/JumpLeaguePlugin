@@ -25,7 +25,6 @@ public class JumpPhase {
         this.zielErreicht = false;
         this.game = Main.getPlugin().getGame();
         this.players = this.game.getPlayers();
-        this.game.deOpPlayers();
         World world = Bukkit.getServer().getWorld("world");
         this.scJ = new ScoreBoardJump();
         this.scJ.setScoreBoard();
@@ -93,8 +92,9 @@ public class JumpPhase {
 
                 JumpPhase.this.scJ.update(this.countdown);
                 if (JumpPhase.this.win()) {
-                    JumpPhase.this.game.reset();
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
+                    game.kickPlayers();
+                    Main.getPlugin().resetAndCreate();
                 }
 
                 if (JumpPhase.this.zielErreicht && this.countdown > 10) {

@@ -20,7 +20,6 @@ import java.util.*;
 
 public class CreateJump {
 
-    private final int MAX_ANZAHL_SPIELER = 6;
     private Location[] modulEnds;
     private Random rand = new Random();
     private int endX;
@@ -110,7 +109,7 @@ public class CreateJump {
 
         this.copyMap(game.getMap());
 
-        for (int i = 1; i <= MAX_ANZAHL_SPIELER; ++i) {
+        for (int i = 1; i <= game.getAnzahlSpieler(); i++) {
             world.getBlockAt((int) this.currentX, (int) this.currentY, (int) this.currentZ + (i * 50)).setType(Material.EMERALD_BLOCK);
             world.getBlockAt((int) this.currentX, (int) this.currentY + 1, (int) this.currentZ + (i * 50)).setType(Material.STONE_PRESSURE_PLATE);
         }
@@ -135,11 +134,6 @@ public class CreateJump {
     private void buildModules(List<Integer> module, int anzahlVorhanden, ModulSchwierigkeit ms) {
         this.game = Main.getPlugin().getGame();
         World world = Bukkit.getServer().getWorld("world");
-        int offset = 0;
-        if (ms == ModulSchwierigkeit.MITTEL)
-            offset = 4;
-        else if (ms == ModulSchwierigkeit.SCHWER)
-            offset = 7;
 
         for (int modulNummer = 0; modulNummer < module.size(); modulNummer++) {
             this.modulZ = (Integer) module.get(modulNummer) * 50;
@@ -154,7 +148,7 @@ public class CreateJump {
                         }
 
                         Location locJump = new Location(world, this.currentX + (double) x, this.currentY + (double) y - 20.0, this.currentZ + (double) z - 25.0);
-                        for (int m = 0; m < MAX_ANZAHL_SPIELER; m++) {
+                        for (int m = 0; m < game.getAnzahlSpieler(); m++) {
                             Block currentBlock = world.getBlockAt(locJump.add(0.0, 0.0, 50.0));
                             if (x == 0 && y == 20 && z == 25) {
                                 String farbe = "§a";
@@ -164,18 +158,14 @@ public class CreateJump {
                                 if (ms.equals(ModulSchwierigkeit.SCHWER)) {
                                     farbe = "§c";
                                 }
-                                floatingText(locJump.add(2, 2.7, 0.5), "§fModul §c" + (modulNummer + offset + 1));
-                                locJump.subtract(2, 2.7, 0.5);
-                                floatingText(locJump.add(2, 2.4, 0.5), "§f Schwierigkeit: " + farbe + ms);
-                                locJump.subtract(2, 2.4, 0.5);
+                                floatingText(locJump.clone().add(2, 2.7, 0.5), "§fModul §c" + (modulNummer + anzahlVorhanden + 1));
+                                floatingText(locJump.clone().add(2, 2.4, 0.5), "§f Schwierigkeit: " + farbe + ms);
 
                                 String rekord = Main.getPlugin().getModulRekorde().getModulRekordAll(module.get(modulNummer));
                                 if (rekord.equalsIgnoreCase("---")) {
-                                    floatingText(locJump.add(2, 2.1, 0.5), "§f Modulrekord: §e---");
-                                    locJump.subtract(2, 2.4, 0.5);
+                                    floatingText(locJump.clone().add(2, 2.1, 0.5), "§f Modulrekord: §e---");
                                 } else {
-                                    floatingText(locJump.add(2, 2.1, 0.5), "§f Modulrekord: §e" + TimeFormat.getTimeMSM(Main.getPlugin().getModulRekorde().getModulRekord(rekord, module.get(modulNummer))) + "§f von §8" + rekord);
-                                    locJump.subtract(2, 2.4, 0.5);
+                                    floatingText(locJump.clone().add(2, 2.1, 0.5), "§f Modulrekord: §e" + TimeFormat.getTimeMSM(Main.getPlugin().getModulRekorde().getModulRekord(rekord, module.get(modulNummer))) + "§f von §8" + rekord);
                                 }
 
                             }
@@ -189,7 +179,7 @@ public class CreateJump {
                             }
                         }
 
-                        locJump.subtract(0.0, 0.0, (double) (50 * MAX_ANZAHL_SPIELER));
+                        locJump.subtract(0.0, 0.0, (double) (50 * game.getAnzahlSpieler()));
                         if (modulBlock.getType().equals(Material.LAPIS_BLOCK) && (int) modulBlock.getLocation().getX() != (int) this.currentX) {
                             this.currentX = locJump.getX();
                             this.currentY = locJump.getY();
@@ -201,7 +191,7 @@ public class CreateJump {
             }
 
             this.modulEnds[modulNummer + anzahlVorhanden] = new Location(world, this.currentX, this.currentY + 1.0, this.currentZ);
-            System.out.println("Modul " + (modulNummer + 1 + offset) + " erstellt.");
+            System.out.println("Modul " + (modulNummer + 1 + anzahlVorhanden) + " erstellt.");
         }
 
     }
@@ -220,7 +210,7 @@ public class CreateJump {
                     if (mapBlock.getType() == Material.AIR) {
                         continue;
                     }
-                    Block currentBlock = world.getBlockAt(this.MAPLOCATIONX + x, this.MAPLOCATIONY + y, this.MAPLOCATIONZ + z);
+                    Block currentBlock = world.getBlockAt(MAPLOCATIONX + x, MAPLOCATIONY + y, MAPLOCATIONZ + z);
                     currentBlock.setType(mapBlock.getType());
                     currentBlock.setBlockData(mapBlock.getBlockData());
                 }
@@ -246,9 +236,9 @@ public class CreateJump {
 
     private void clearJumpArea() {
         World world = Bukkit.getServer().getWorld("world");
-        for (int i = 0; i < 750; ++i) {
-            for (int k = 0; k < 170; ++k) {
-                for (int l = 0; l < 330; ++l) {
+        for (int i = 0; i < (game.getAnzahlLeicht() + game.getAnzahlMittel() + game.getAnzahlSchwer()) * 50 + 50; i++) {
+            for (int k = 0; k < 155; ++k) {
+                for (int l = 0; l < game.getAnzahlSpieler() * 50 + 50; ++l) {
                     Block b = world.getBlockAt(200 + i, 75 + k, 10 + l);
                     if (b.getType() != Material.AIR) {
                         b.setType(Material.AIR);

@@ -15,7 +15,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Difficulty;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -24,7 +23,6 @@ public class Game {
     private static GameStates gs;
     private static ServerStatus status;
     private final List<JlPlayer> players;
-    private ArrayList<Player> opPlayers;
     private final Random rand = new Random();
     private final CreateJump cj;
     private final LobbyPhase lp;
@@ -39,19 +37,20 @@ public class Game {
     private int anzahlSchwer;
     private int jumpZeit;
     private int pvpZeit;
+    private int anzahlSpieler;
     private String map;
 
-    public Game() {
+    public Game(int anzahlLeicht, int anzahlMittel, int anzahlSchwer, int jumpZeit, int pvpZeit, int maxItemsChest, int anzahlSpieler) {
         gs = GameStates.LOBBY;
         status = ServerStatus.STARTING;
         Bukkit.getWorld("world").setDifficulty(Difficulty.EASY);
-        this.opPlayers = new ArrayList<Player>();
-        this.anzahlLeicht = 4;
-        this.anzahlMittel = 3;
-        this.anzahlSchwer = 3;
-        this.jumpZeit = 10;
-        this.pvpZeit = 5;
-        this.anzahlItemsChest = 5;
+        this.anzahlLeicht = anzahlLeicht;
+        this.anzahlMittel = anzahlMittel;
+        this.anzahlSchwer = anzahlSchwer;
+        this.jumpZeit = jumpZeit;
+        this.pvpZeit = pvpZeit;
+        this.anzahlItemsChest = maxItemsChest;
+        this.anzahlSpieler = anzahlSpieler;
         this.cj = new CreateJump();
         List<String> maps = Main.getPlugin().getTpM().getMaps();
         if (!maps.isEmpty()) {
@@ -82,7 +81,7 @@ public class Game {
         }, 100L);
     }
 
-    public void reset() {
+    public void kickPlayers() {
         for (JlPlayer p : this.players) {
             if (p != null) {
                 ByteArrayDataOutput out = ByteStreams.newDataOutput();
@@ -91,21 +90,6 @@ public class Game {
                 p.getPlayer().sendPluginMessage(Main.getPlugin(), "BungeeCord", out.toByteArray());
             }
         }
-
-        this.anzahlItemsChest = 5;
-        this.anzahlLeicht = 4;
-        this.anzahlMittel = 3;
-        this.anzahlSchwer = 3;
-        this.jumpZeit = 10;
-        this.pvpZeit = 5;
-        this.map = Main.getPlugin().getTpM().getMaps().get(rand.nextInt(Main.getPlugin().getTpM().getMaps().size()));
-        this.opPlayers = new ArrayList<Player>();
-        this.cj.reset();
-        this.lp.reset();
-        this.jp.reset();
-        gs = GameStates.LOBBY;
-        status = ServerStatus.STARTING;
-        this.lp.createGame();
     }
 
     public boolean joinGame(Player p) {
@@ -131,19 +115,6 @@ public class Game {
         return this.players.remove(new JlPlayer(p, -1));
     }
 
-    public void deOpPlayers() {
-        for (Player p : this.players.stream().map(JlPlayer::getPlayer).toList()) {
-            if (p.isOp()) {
-                p.setOp(false);
-                this.opPlayers.add(p);
-            }
-        }
-    }
-
-    public void opPlayers() {
-        players.forEach(p -> p.getPlayer().setOp(true));
-    }
-
     public boolean containsPlayer(Player p) {
         return this.players.stream().map(JlPlayer::getPlayer).toList().contains(p);
     }
@@ -155,22 +126,6 @@ public class Game {
     public JlPlayer getJlPlayerFromPlayer(Player p) {
         return players.get(players.indexOf(new JlPlayer(p, -1)));
     }
-
-    /**
-     * public int getPlayerIndex(Player p) {
-     * for (int i = 0; i < this.players.length; ++i) {
-     * if (this.players[i] == null) {
-     * return -1;
-     * }
-     * <p>
-     * if (this.players[i].getPlayer().equals(p)) {
-     * return i;
-     * }
-     * }
-     * <p>
-     * return -1;
-     * }
-     **/
 
     public int getJoinedPlayers() {
         return this.players.size();
@@ -278,5 +233,9 @@ public class Game {
 
     public static void setStatus(ServerStatus status) {
         Game.status = status;
+    }
+
+    public int getAnzahlSpieler() {
+        return anzahlSpieler;
     }
 }

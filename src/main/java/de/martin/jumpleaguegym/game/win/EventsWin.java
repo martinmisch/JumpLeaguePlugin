@@ -12,9 +12,6 @@ import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public class EventsWin implements Listener {
-    public EventsWin() {
-    }
-
     @EventHandler
     public void onChat(AsyncPlayerChatEvent e) {
         if (Game.getGs().equals(GameStates.WIN)) {

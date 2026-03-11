@@ -18,7 +18,7 @@ public class Create implements CommandExecutor {
         } else if (!(sender instanceof Player)) {
             return false;
         } else {
-            if (Game.getGs().equals(GameStates.LOBBY)) {
+            if (Game.getGs().equals(GameStates.LOBBY) || Game.getGs().equals(GameStates.CREATED)) {
                 Main.getPlugin().getGame().getLp().openCreateInv((Player) sender);
                 System.out.println("create");
             } else {

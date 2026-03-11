@@ -18,9 +18,6 @@ public class EventsPractise implements Listener {
     private PractiseMode pm;
     private ArrayList<PractiseModePlayer> players;
 
-    public EventsPractise() {
-    }
-
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent e) {
         this.game = Main.getPlugin().getGame();

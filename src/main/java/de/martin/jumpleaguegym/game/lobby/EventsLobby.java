@@ -10,9 +10,6 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 
 public class EventsLobby implements Listener {
-    public EventsLobby() {
-    }
-
     @EventHandler
     public void onFoodLevelChange(FoodLevelChangeEvent e) {
         if (Game.getGs().equals(GameStates.LOBBY) || Game.getGs().equals(GameStates.CREATED) || Game.getGs().equals(GameStates.STARTED)) {

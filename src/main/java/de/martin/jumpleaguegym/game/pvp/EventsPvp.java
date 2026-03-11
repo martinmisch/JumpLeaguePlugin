@@ -30,15 +30,11 @@ import java.util.*;
 public class EventsPvp implements Listener {
     private final Random rand = new Random();
     private Game game;
-    private List<JlPlayer> players;
-
-    public EventsPvp() {
-    }
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent e) {
         this.game = Main.getPlugin().getGame();
-        this.players = this.game.getPlayers();
+        List<JlPlayer> players = this.game.getPlayers();
         if (Game.getGs().equals(GameStates.PVP)) {
             Player killed = e.getEntity();
             if (this.game.containsPlayer(killed)) {
@@ -78,7 +74,7 @@ public class EventsPvp implements Listener {
     @EventHandler
     public void onPlayerRespawn(PlayerRespawnEvent e) {
         this.game = Main.getPlugin().getGame();
-        this.players = this.game.getPlayers();
+        List<JlPlayer> players = this.game.getPlayers();
         if (Game.getGs().equals(GameStates.PVP)) {
             if (this.game.containsPlayer(e.getPlayer())) {
                 e.setRespawnLocation(this.getRandPlayerLocation(e.getPlayer()));
@@ -88,6 +84,7 @@ public class EventsPvp implements Listener {
 
     //Spawnpunkt mit größter Distanz zu allen Spielern zurückgeben
     public Location getRandPlayerLocation(Player p) {
+        List<JlPlayer> players = game.getPlayers();
         Location pos1 = Main.getPlugin().getTpM().getBounds(game.getMap(), 1);
         Vector relative = pos1.toVector().subtract(new Location(Bukkit.getWorld("world"), CreateJump.MAPLOCATIONX, CreateJump.MAPLOCATIONY, CreateJump.MAPLOCATIONZ).toVector());
 
