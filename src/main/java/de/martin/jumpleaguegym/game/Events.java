@@ -99,7 +99,7 @@ public class Events implements Listener {
     @EventHandler
     public void onBlockExplosion(EntityExplodeEvent e) {
         e.blockList().clear();
-        e.setCancelled(true);
+        //e.setCancelled(true);
     }
 
 

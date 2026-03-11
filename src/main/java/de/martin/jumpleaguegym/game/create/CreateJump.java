@@ -12,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
+import org.bukkit.block.data.type.Door;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -169,9 +170,17 @@ public class CreateJump {
                                 }
 
                             }
+                            if (modulBlock.getBlockData() instanceof Door && modulBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData() instanceof Door) {
+                                System.out.println("Tür unten bei " + modulBlock.getLocation().toString());
+                                continue;
+                            }
+                            if (modulBlock.getBlockData() instanceof Door && modulBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData() instanceof Door) {
+                                currentBlock.setBlockData(modulBlock.getBlockData());
+                                currentBlock.getLocation().clone().add(0, 1, 0).getBlock().setBlockData(modulBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData());
+                            } else {
+                                currentBlock.setBlockData(modulBlock.getBlockData());
+                            }
 
-                            currentBlock.setType(modulBlock.getType());
-                            currentBlock.setBlockData(modulBlock.getBlockData());
                             if (currentBlock.getType().equals(Material.CHEST)) {
                                 Chest c = (Chest) currentBlock.getState();
                                 ItemStack[] items1 = this.game.getChI().getRandomItems(ms, this.game.getAnzahlItemsChest());
@@ -210,9 +219,17 @@ public class CreateJump {
                     if (mapBlock.getType() == Material.AIR) {
                         continue;
                     }
-                    Block currentBlock = world.getBlockAt(MAPLOCATIONX + x, MAPLOCATIONY + y, MAPLOCATIONZ + z);
-                    currentBlock.setType(mapBlock.getType());
-                    currentBlock.setBlockData(mapBlock.getBlockData());
+                    if (mapBlock.getBlockData() instanceof Door && mapBlock.getLocation().clone().add(0, -1, 0).getBlock().getBlockData() instanceof Door) {
+                        continue;
+                    }
+                    if (mapBlock.getBlockData() instanceof Door && mapBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData() instanceof Door) {
+                        Block currentBlock = world.getBlockAt(MAPLOCATIONX + x, MAPLOCATIONY + y, MAPLOCATIONZ + z);
+                        currentBlock.setBlockData(mapBlock.getBlockData());
+                        currentBlock.getLocation().clone().add(0, 1, 0).getBlock().setBlockData(mapBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData());
+                    } else {
+                        Block currentBlock = world.getBlockAt(MAPLOCATIONX + x, MAPLOCATIONY + y, MAPLOCATIONZ + z);
+                        currentBlock.setBlockData(mapBlock.getBlockData());
+                    }
                 }
             }
         }

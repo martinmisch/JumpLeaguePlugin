@@ -38,7 +38,7 @@ public class ScoreBoardJump {
         this.preTime = "§7Zeit: ";
         this.sideBar.getScore(this.preTime).setScore(15);
 
-        preProzent.addAll(players.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(0%)").toList());
+        preProzent.addAll(players.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(0%)" + "§f - §e" + (p.getPlayerCheckpointsNumber() + 1)).toList());
         players.forEach(p -> p.getPlayer().setScoreboard(this.scB));
     }
 
@@ -53,7 +53,7 @@ public class ScoreBoardJump {
         preProzent.clear();
 
         List<JlPlayer> sortedPlayers = ScoreBoardSort.getSortedProzent(players);
-        preProzent.addAll(sortedPlayers.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(p.getPlayer()) + "%)").toList());
+        preProzent.addAll(sortedPlayers.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(p.getPlayer()) + "%)" + "§f - §e" + (p.getPlayerCheckpointsNumber() + 1)).toList());
 
 
         for (int i = 0; i < preProzent.size(); i++) {
