@@ -27,3 +27,5 @@ commands:
     description: Speichert Deatchmatch Spawnpoints, bounds und Endpoints.
   tpmapLocation:
     description: Tp't zu Deatchmatch Spawnpoints, bounds und Endpoints.
+  achievements:
+    description: Zeigt die Achievements des Spielers.

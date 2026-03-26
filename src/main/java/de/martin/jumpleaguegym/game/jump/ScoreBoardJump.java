@@ -53,7 +53,13 @@ public class ScoreBoardJump {
         preProzent.clear();
 
         List<JlPlayer> sortedPlayers = ScoreBoardSort.getSortedProzent(players);
-        preProzent.addAll(sortedPlayers.stream().map(p -> "§f" + p.getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(p.getPlayer()) + "%)" + "§f - §e" + (p.getPlayerCheckpointsNumber() + 1)).toList());
+        preProzent.addAll(sortedPlayers.stream().map(p -> {
+            int modul = p.getPlayerCheckpointsNumber() + 1;
+            if (modul == Main.getPlugin().getGame().getModulAnzahl() + 1) {
+                modul = Main.getPlugin().getGame().getModulAnzahl();
+            }
+            return "§f" + p.getPlayer().getName() + " §7(" + ScoreBoardSort.getProzent(p.getPlayer()) + "%)" + "§f §e" + modul + "/" + Main.getPlugin().getGame().getModulAnzahl();
+        }).toList());
 
 
         for (int i = 0; i < preProzent.size(); i++) {

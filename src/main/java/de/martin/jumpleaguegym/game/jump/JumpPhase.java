@@ -18,6 +18,8 @@ public class JumpPhase {
     private boolean zielErreicht;
     private List<JlPlayer> players;
 
+    private int countdown;
+
     public JumpPhase() {
     }
 
@@ -58,6 +60,7 @@ public class JumpPhase {
                     Game.setGs(GameStates.JUMP);
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
                     JumpPhase.this.jumpCountdown();
+                    game.getPractise().getPlayers().clear();
                 } else {
                     for (JlPlayer p : players) {
                         p.getPlayer().resetTitle();
@@ -72,15 +75,14 @@ public class JumpPhase {
 
     public void jumpCountdown() {
         this.taskID = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.getPlugin(), new Runnable() {
-            int countdown;
 
             {
-                this.countdown = JumpPhase.this.game.getJumpZeit() * 60;
+                countdown = JumpPhase.this.game.getJumpZeit() * 60;
             }
 
             public void run() {
 
-                if (this.countdown == JumpPhase.this.game.getJumpZeit() * 60) {
+                if (countdown == JumpPhase.this.game.getJumpZeit() * 60) {
                     Bukkit.broadcastMessage("§c[JLG] §fDie Jumpphase beginnt.");
 
                     players.forEach(p -> {
@@ -90,30 +92,32 @@ public class JumpPhase {
                     });
                 }
 
-                JumpPhase.this.scJ.update(this.countdown);
+                JumpPhase.this.scJ.update(countdown);
                 if (JumpPhase.this.win()) {
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
                     game.kickPlayers();
                     Main.getPlugin().resetAndCreate();
                 }
 
-                if (JumpPhase.this.zielErreicht && this.countdown > 10) {
-                    this.countdown = 10;
+                if (JumpPhase.this.zielErreicht && countdown > 10) {
+                    Main.getPlugin().getAm().achievementZielInTime();
+                    countdown = 10;
                 }
 
-                if (this.countdown <= 10) {
-                    Bukkit.broadcastMessage("§c[JLG] §fDie Jumpphase endet in " + this.countdown + " Sekunden.");
+                if (countdown <= 10) {
+                    Bukkit.broadcastMessage("§c[JLG] §fDie Jumpphase endet in " + countdown + " Sekunden.");
                     players.forEach(p -> p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1.0F, 0.7F));
                 }
 
-                if (this.countdown <= 0) {
+                if (countdown <= 0) {
+                    Main.getPlugin().getAm().achievementZielErreicht();
                     players.forEach(p -> p.getPlayer().getInventory().setItem(8, new ItemStack(Material.AIR)));
                     Game.setGs(GameStates.PVP);
                     Main.getPlugin().getGame().getPp().startGame();
                     Bukkit.getScheduler().cancelTask(JumpPhase.this.taskID);
                 }
 
-                --this.countdown;
+                countdown--;
             }
         }, 0L, 20L);
     }
@@ -129,5 +133,9 @@ public class JumpPhase {
 
     public void setZielErreicht(boolean zielErreicht) {
         this.zielErreicht = zielErreicht;
+    }
+
+    public int getCountdown() {
+        return countdown;
     }
 }

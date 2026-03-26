@@ -46,8 +46,9 @@ public class WinPhase {
                         p.sendTitle("§a" + s, "§ahat die Runde gewonnen.");
                     }
                 }
-
-                Bukkit.broadcastMessage("§c[JLG] §fDie Lobby startet in " + this.i + "s neu.");
+                if (i > 0) {
+                    Bukkit.broadcastMessage("§c[JLG] §fDie Lobby startet in " + this.i + "s neu.");
+                }
                 if (this.i == 0) {
                     game.kickPlayers();
                 }

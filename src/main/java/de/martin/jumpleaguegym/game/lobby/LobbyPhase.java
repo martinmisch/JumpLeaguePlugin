@@ -6,6 +6,7 @@ import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.game.JlPlayer;
 import de.martin.jumpleaguegym.main.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -75,6 +76,7 @@ public class LobbyPhase implements CommandExecutor {
 
                     for (JlPlayer p : LobbyPhase.this.game.getPlayers()) {
                         p.getPlayer().setLevel(this.countdown);
+                        p.getPlayer().playSound(p.getPlayer().getLocation(), Sound.BLOCK_NOTE_BLOCK_BELL, 1.0F, 1.0F);
                         if (this.countdown == 5) {
                             p.getPlayer().sendTitle("§bJump-League", "");
                         }

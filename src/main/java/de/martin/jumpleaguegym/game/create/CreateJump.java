@@ -166,12 +166,11 @@ public class CreateJump {
                                 if (rekord.equalsIgnoreCase("---")) {
                                     floatingText(locJump.clone().add(2, 2.1, 0.5), "§f Modulrekord: §e---");
                                 } else {
-                                    floatingText(locJump.clone().add(2, 2.1, 0.5), "§f Modulrekord: §e" + TimeFormat.getTimeMSM(Main.getPlugin().getModulRekorde().getModulRekord(rekord, module.get(modulNummer))) + "§f von §8" + rekord);
+                                    floatingText(locJump.clone().add(2, 2.1, 0.5), "§f Modulrekord: §e" + TimeFormat.getTimeMSM(Main.getPlugin().getModulRekorde().getModulRekord(rekord, module.get(modulNummer))) + "§f von §e" + rekord);
                                 }
 
                             }
                             if (modulBlock.getBlockData() instanceof Door && modulBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData() instanceof Door) {
-                                System.out.println("Tür unten bei " + modulBlock.getLocation().toString());
                                 continue;
                             }
                             if (modulBlock.getBlockData() instanceof Door && modulBlock.getLocation().clone().add(0, 1, 0).getBlock().getBlockData() instanceof Door) {

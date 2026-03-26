@@ -8,6 +8,7 @@ public class JlPlayer {
 
     private int playerIndex;
     private boolean alive;
+    private int jumpFails;
     private boolean zielErreicht;
     private int deathCount;
     private Location playerCheckPointLocation;
@@ -23,6 +24,7 @@ public class JlPlayer {
         this.deathCount = 0;
         this.playerCheckpointsNumber = 0;
         this.playerIndex = playerIndex;
+        this.jumpFails = 0;
     }
 
     public boolean isAlive() {
@@ -83,6 +85,14 @@ public class JlPlayer {
 
     public void setSystemTimeLastCheckpoint(long systemTimeLastCheckpoint) {
         this.systemTimeLastCheckpoint = systemTimeLastCheckpoint;
+    }
+
+    public int getJumpFails() {
+        return jumpFails;
+    }
+
+    public void setJumpFails(int jumpFails) {
+        this.jumpFails = jumpFails;
     }
 
     //JLPlayer werden nur anhand der Player verglichen

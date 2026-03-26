@@ -1,5 +1,6 @@
 package de.martin.jumpleaguegym.main;
 
+import de.martin.jumpleaguegym.achievements.AchievementManager;
 import de.martin.jumpleaguegym.commands.*;
 import de.martin.jumpleaguegym.game.Events;
 import de.martin.jumpleaguegym.game.Game;
@@ -28,10 +29,13 @@ public class Main extends JavaPlugin implements PluginMessageListener {
     private ChestItemManager chM;
 
     private ModulRekorde modulRekorde;
+
+    private AchievementManager am;
     private Events events;
     private Game game;
 
     public int anzahlLeicht = 4, anzahlMittel = 3, anzahlSchwer = 3, jumpZeit = 10, pvpZeit = 5, maxChestItems = 5, anzahlSpieler = 5;
+    //public int anzahlLeicht = 1, anzahlMittel = 1, anzahlSchwer = 1, jumpZeit = 2, pvpZeit = 2, maxChestItems = 5, anzahlSpieler = 2;
 
     public Main() {
     }
@@ -45,6 +49,7 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         resetAndCreate();
         this.chM = new ChestItemManager(this);
         this.modulRekorde = new ModulRekorde(this);
+        this.am = new AchievementManager(this);
         this.events = new Events();
         this.pm.registerEvents(this.events, this);
         this.pm.registerEvents(new EventsLobby(), this);
@@ -65,6 +70,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
         this.getCommand("practise").setExecutor(new Practise());
         this.getCommand("items").setExecutor(new ChestItemsCommand());
         this.getCommand("hub").setExecutor(new Hub());
+        this.getCommand("achievements").setExecutor(new Achievement());
+
         System.out.println("Plugin erfolgreich gestartet!");
     }
 
@@ -97,5 +104,9 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 
     public ModulRekorde getModulRekorde() {
         return modulRekorde;
+    }
+
+    public AchievementManager getAm() {
+        return am;
     }
 }

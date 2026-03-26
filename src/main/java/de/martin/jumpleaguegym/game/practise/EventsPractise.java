@@ -1,6 +1,7 @@
 package de.martin.jumpleaguegym.game.practise;
 
 import de.martin.jumpleaguegym.game.Game;
+import de.martin.jumpleaguegym.game.GameStates;
 import de.martin.jumpleaguegym.main.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -42,6 +43,9 @@ public class EventsPractise implements Listener {
 
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
+        if (!Game.getGs().equals(GameStates.CREATED)) {
+            return;
+        }
         if (e.getEntity() instanceof Player) {
             if (this.game.getPractise().contains((Player) e.getEntity())) {
                 e.setCancelled(true);

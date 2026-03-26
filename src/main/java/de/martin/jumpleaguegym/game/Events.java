@@ -104,7 +104,7 @@ public class Events implements Listener {
 
 
     @EventHandler
-    public void onBlockBreak(BlockPhysicsEvent e) {
+    public void onBlockPhysics(BlockPhysicsEvent e) {
         if (e.getBlock().getBlockData() instanceof Door || e.getBlock().getType() == Material.WATER || e.getBlock().getType().toString().contains("DRIPLEAF")) {
             return;
         }

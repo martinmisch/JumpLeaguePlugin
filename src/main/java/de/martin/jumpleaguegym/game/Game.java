@@ -191,6 +191,10 @@ public class Game {
         return this.anzahlSchwer;
     }
 
+    public int getModulAnzahl() {
+        return getAnzahlLeicht() + getAnzahlMittel() + getAnzahlSchwer();
+    }
+
     public PractiseMode getPractise() {
         return this.practise;
     }

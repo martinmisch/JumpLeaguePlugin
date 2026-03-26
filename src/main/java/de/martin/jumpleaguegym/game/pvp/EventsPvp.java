@@ -104,36 +104,42 @@ public class EventsPvp implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
-        if (Game.getGs().equals(GameStates.PVP)) {
-            if (this.game.containsPlayer(e.getPlayer())) {
-                if (e.getBlock().getType().equals(Material.TNT)) {
-                    Bukkit.getWorld("world").getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
-                    Bukkit.getWorld("world").spawn(e.getBlock().getLocation(), TNTPrimed.class).setFuseTicks(32);
-                } else if (!e.getBlock().getType().equals(Material.COBWEB)) {
-                    e.setCancelled(true);
-                }
+        if (!Game.getGs().equals(GameStates.PVP)) {
+            return;
+        }
+        if (this.game.containsPlayer(e.getPlayer())) {
+            if (e.getBlock().getType().equals(Material.TNT)) {
+                Bukkit.getWorld("world").getBlockAt(e.getBlock().getLocation()).setType(Material.AIR);
+                Bukkit.getWorld("world").spawn(e.getBlock().getLocation(), TNTPrimed.class).setFuseTicks(32);
+            } else if (!e.getBlock().getType().equals(Material.COBWEB) && !e.getBlock().getType().equals(Material.FIRE)) {
+                e.setCancelled(true);
             }
+
         }
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        if (Game.getGs().equals(GameStates.PVP)) {
-            if (this.game.containsPlayer(e.getPlayer())) {
-                if (!e.getBlock().getType().equals(Material.COBWEB)) {
-                    e.setCancelled(true);
-                }
+        if (!Game.getGs().equals(GameStates.PVP)) {
+            return;
+        }
+        if (this.game.containsPlayer(e.getPlayer())) {
+            if (!e.getBlock().getType().equals(Material.COBWEB) && !e.getBlock().getType().equals(Material.FIRE)) {
+                e.setCancelled(true);
             }
+
         }
     }
 
     @EventHandler
     public void onInteract(PlayerInteractEvent e) {
-        this.game = Main.getPlugin().getGame();
         if (Game.getGs().equals(GameStates.PVP)) {
-            if (e.hasBlock() && e.getClickedBlock().getType().equals(Material.BEACON)) {
-                e.setCancelled(true);
-            }
+            return;
+        }
+        this.game = Main.getPlugin().getGame();
+        if (e.hasBlock() && e.getClickedBlock().getType().equals(Material.BEACON)) {
+            e.setCancelled(true);
+
         }
     }
 
