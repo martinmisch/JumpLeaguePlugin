@@ -34,8 +34,8 @@ public class Main extends JavaPlugin implements PluginMessageListener {
     private Events events;
     private Game game;
 
-    public int anzahlLeicht = 4, anzahlMittel = 3, anzahlSchwer = 3, jumpZeit = 10, pvpZeit = 5, maxChestItems = 5, anzahlSpieler = 5;
-    //public int anzahlLeicht = 1, anzahlMittel = 1, anzahlSchwer = 1, jumpZeit = 2, pvpZeit = 2, maxChestItems = 5, anzahlSpieler = 2;
+    public int anzahlLeicht = 3, anzahlMittel = 4, anzahlSchwer = 3, jumpZeit = 10, pvpZeit = 5, maxChestItems = 5, anzahlSpieler = 5;
+    //public int anzahlLeicht = 1, anzahlMittel = 1, anzahlSchwer = 1, jumpZeit = 2, pvpZeit = 2, maxChestItems = 5, anzahlSpieler = 1;
 
     public Main() {
     }
