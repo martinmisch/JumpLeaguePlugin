@@ -11,10 +11,9 @@ import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PvpPhase {
     private Game game;
@@ -42,8 +41,14 @@ public class PvpPhase {
         Location pos1 = Main.getPlugin().getTpM().getBounds(game.getMap(), 1);
         Vector relative = pos1.toVector().subtract(new Location(pos1.getWorld(), CreateJump.MAPLOCATIONX, CreateJump.MAPLOCATIONY, CreateJump.MAPLOCATIONZ).toVector());
 
+        List<Integer> spawnIndices = IntStream.rangeClosed(1, 10)
+                .boxed()
+                .collect(Collectors.toList());
+
+        Collections.shuffle(spawnIndices);
+
         players.forEach(p -> {
-            p.getPlayer().teleport(Main.getPlugin().getTpM().getDfLocation(this.game.getMap(), p.getPlayerIndex() + 1).subtract(relative));
+            p.getPlayer().teleport(Main.getPlugin().getTpM().getDfLocation(this.game.getMap(), spawnIndices.get(p.getPlayerIndex())).subtract(relative));
             p.getPlayer().setGameMode(GameMode.SURVIVAL);
             p.getPlayer().getPlayer().setHealth(20.0);
             p.getPlayer().getPlayer().setFoodLevel(20);
